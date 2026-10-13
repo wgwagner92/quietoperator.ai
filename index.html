@@ -113,43 +113,59 @@
   .device .screen .tile b { font-family: var(--display); font-size: clamp(2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -0.03em; color: var(--tile, #2DD4BF); }
 
   /* ---------- home: hero ---------- */
-  .hero { position: relative; padding: 3.6rem 0 2.6rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 2.4rem 3.5rem; align-items: center; }
+  .hero { position: relative; padding: 3.4rem 0 2.4rem; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.2fr); gap: 2.2rem 3.2rem; align-items: center; }
   .hero::before { content: ""; position: absolute; inset: -1px -1.25rem 0; z-index: -1; pointer-events: none;
     background-image: radial-gradient(var(--grid) 1px, transparent 1.2px); background-size: 22px 22px;
     -webkit-mask-image: radial-gradient(ellipse 70% 80% at 60% 40%, #000 30%, transparent 75%); mask-image: radial-gradient(ellipse 70% 80% at 60% 40%, #000 30%, transparent 75%); }
   .hero h1 { max-width: 13ch; }
-  .hero .lede { font-size: 1.12rem; color: var(--muted); max-width: 46ch; margin: 1.1rem 0 1.5rem; }
+  .hero .lede { font-size: 1.08rem; color: var(--muted); max-width: 46ch; margin: 1.1rem 0 1.4rem; }
   .hero .cta { display: flex; gap: .6rem; flex-wrap: wrap; }
-  .hero .cap { margin-top: .75rem; font-size: .85rem; color: var(--muted); display: flex; gap: .5rem 1.2rem; flex-wrap: wrap; align-items: center; }
-  .hero .cap .dots { display: inline-flex; gap: 5px; }
-  .hero .cap .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong); cursor: pointer; }
-  .hero .cap .dots i.on { background: var(--ink); }
+  .hero-visual { position: relative; --accent: #2DD4BF; }
+  .hero-visual::before { content: ""; position: absolute; inset: 8% -6% -4%; z-index: -1; border-radius: 40px; filter: blur(48px); opacity: .55;
+    background: radial-gradient(60% 60% at 50% 50%, color-mix(in srgb, var(--accent) 45%, transparent), transparent 70%); transition: background .6s; }
+  .apptabs { display: flex; gap: .3rem; margin-bottom: .8rem; overflow-x: auto; scrollbar-width: none; }
+  .apptabs::-webkit-scrollbar { display: none; }
+  .apptabs button { flex: none; font: 600 .85rem/1 var(--body); color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 999px; padding: .5rem .85rem; cursor: pointer; display: inline-flex; align-items: center; gap: .45rem; transition: color .15s, background .15s, border-color .15s; }
+  .apptabs button i { width: 7px; height: 7px; border-radius: 50%; background: var(--dot, var(--line-strong)); }
+  .apptabs button:hover { color: var(--ink); background: var(--surface); }
+  .apptabs button[aria-selected="true"] { color: var(--ink); background: var(--surface); border-color: var(--line); }
+  .hero-stage { position: relative; }
+  .hero-stage .phone { width: min(300px, 70%); }
+  .hero-stage .screen img, .hero-stage .scr img { transition: opacity .45s; }
+  .hero .cap { margin-top: .8rem; font-size: .85rem; color: var(--muted); display: flex; gap: .6rem 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .hero .cap .viewtoggle button { padding: .35rem .7rem; }
+  .hero-stage .phone.live-sizer { width: auto; aspect-ratio: auto; padding: 0; background: transparent; border: 0; box-shadow: none; }
+  .hero-stage .live-wrap { position: relative; margin: 0 auto; }
   @media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 2.4rem; } .hero h1 { max-width: 16ch; } }
 
-  /* ---------- home: status board ---------- */
-  .board { border-top: 1px solid var(--line-strong); margin-top: 1.5rem; }
-  .board-head { display: flex; justify-content: space-between; align-items: baseline; padding: 1.2rem 0 .4rem; color: var(--muted); font-size: .9rem; }
-  .row { display: grid; grid-template-columns: 104px 1.1fr 2fr auto auto; gap: 1.4rem; align-items: center; padding: .9rem 0; border-bottom: 1px solid var(--line); color: inherit; position: relative; transition: background .15s; }
-  .row::before { content: ""; position: absolute; inset: 0 -1.2rem; background: var(--surface); opacity: 0; border-radius: 10px; z-index: -1; transition: opacity .15s; }
-  .row:hover { text-decoration: none; }
-  .row:hover::before { opacity: 1; }
-  .thumb { width: 104px; aspect-ratio: 16 / 10; border-radius: 6px; overflow: hidden; background: var(--frame); border: 1px solid color-mix(in srgb, var(--frame) 70%, var(--line-strong)); display: grid; place-items: center; transition: transform .2s; }
-  .row:hover .thumb { transform: translateY(-1px) scale(1.03); }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
-  .thumb b { font-family: var(--display); font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; color: var(--tile, #2DD4BF); }
-  .row .name { font-family: var(--display); font-weight: 600; font-size: 1.28rem; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
-  .row .name small { font-family: var(--body); font-weight: 400; font-size: .82rem; color: var(--muted); letter-spacing: 0; }
-  .row .job { color: var(--muted); font-size: 1rem; max-width: 44ch; }
-  .row .open { font-weight: 600; color: var(--ink); font-size: .95rem; transition: transform .15s; }
-  .row:hover .open { color: var(--accent); transform: translateX(2px); }
-  @media (max-width: 760px) {
-    .row { grid-template-columns: 84px 1fr auto; grid-template-areas: "thumb name lamp" "thumb job job"; gap: .25rem 1rem; align-items: start; }
-    .thumb { grid-area: thumb; width: 84px; margin-top: .2rem; }
-    .row .name { grid-area: name; font-size: 1.15rem; }
-    .row .job { grid-area: job; font-size: .93rem; }
-    .row .lamp { grid-area: lamp; }
-    .row .open { display: none; }
-  }
+  /* ---------- home: build cards ---------- */
+  .grid-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: 2.2rem 0 1.1rem; }
+  .grid-head h2 { font-size: clamp(1.3rem, 2.2vw, 1.6rem); }
+  .grid-head span { color: var(--muted); font-size: .9rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+  .card { --accent: #2DD4BF; --mx: 50%; --my: 50%; position: relative; display: grid; grid-template-rows: auto 1fr; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); color: inherit; overflow: hidden; isolation: isolate; transition: transform .25s cubic-bezier(.2,.7,.2,1), border-color .25s; }
+  .card:hover { text-decoration: none; transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+  .card::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(520px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 12%, transparent), transparent 42%); }
+  .card:hover::before { opacity: 1; }
+  .card.wide { grid-column: 1 / -1; grid-template-columns: 1.25fr 1fr; grid-template-rows: none; }
+  .card-media { position: relative; background: var(--frame); aspect-ratio: 16 / 10; overflow: hidden; }
+  .card.wide .card-media { aspect-ratio: auto; min-height: 360px; }
+  .card-media .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .card:hover .card-media .shot { transform: scale(1.025); }
+  .card-media .shot-p { position: absolute; right: 5%; bottom: -8%; width: 23%; border-radius: 18px; border: 3px solid #0A0D0F; background: #0A0D0F; box-shadow: 0 20px 40px -16px rgba(0,0,0,.6); transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .card:hover .card-media .shot-p { transform: translateY(-6px); }
+  .card-media .tilebg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--frame-ink); }
+  .card-media .tilebg b { font-family: var(--display); font-size: 3rem; font-weight: 700; color: var(--accent); }
+  .card-body { position: relative; z-index: 1; padding: 1.2rem 1.3rem 1.3rem; display: grid; gap: .7rem; align-content: start; }
+  .card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .card-top h3 { font-size: 1.35rem; letter-spacing: -0.015em; }
+  .card-body p { color: var(--muted); font-size: .95rem; max-width: none; }
+  .caps { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; margin: .1rem 0 0; padding: 0; }
+  .caps li { font-size: .78rem; font-weight: 500; color: var(--ink); border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: .22rem .6rem; }
+  .card .open { font-weight: 600; font-size: .92rem; color: var(--accent-ink-text, var(--accent)); margin-top: .2rem; filter: saturate(.8) brightness(.85); }
+  .card:hover .open { text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .card.wide { grid-template-columns: 1fr; } .card.wide .card-media { aspect-ratio: 16 / 10; min-height: 0; } .grid-head { flex-direction: column; align-items: flex-start; gap: .2rem; } }
 
   /* ---------- home: how I build ---------- */
   .how { margin-top: 4.5rem; }
@@ -178,7 +194,7 @@
   .bhead { display: grid; grid-template-columns: 1fr auto; gap: 1.2rem 2rem; align-items: end; padding-bottom: 1.8rem; }
   .bhead h1 { display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap; }
   .bhead h1 small { font-family: var(--body); font-weight: 400; font-size: .95rem; color: var(--muted); letter-spacing: 0; line-height: 1.3; }
-  .bhead .one { font-size: 1.22rem; color: var(--muted); margin: .7rem 0 1rem; max-width: 48ch; }
+  .bhead .one { font-size: 1.1rem; color: var(--muted); margin: .7rem 0 1rem; max-width: 62ch; }
   .bhead .meta { display: grid; gap: .7rem; justify-items: start; }
   .bhead .actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
   .bhead .note { font-size: .82rem; color: var(--muted); }
@@ -289,9 +305,8 @@
    ===================================================================== */
 const SITE = {
   headline: "Small software, built to be used every day.",
-  lede: "I'm Bill. I design and build small tools and websites in my free time, then use them every day. Everything here is real and running. Open any of them and try it with sample data.",
-  heroDemo: { slug: "chief-of-stuff", url: "demo/chief-of-stuff/", label: "Live demo · Chief of Stuff",
-    shots: ["img/chief-of-stuff/dashboard.jpg", "img/chief-of-stuff/week.jpg", "img/chief-of-stuff/meals-week.jpg", "img/chief-of-stuff/shopping.jpg"] },
+  lede: "I'm Bill. In my free time I design and build small software and use it every day: a life operating system, a thinking journal, a friendship map, a recovery companion, and a couple of websites. Everything here is real and running. Open any of them and try it with sample data.",
+  heroApps: ["chief-of-stuff", "calibrate", "keel", "orbit"],
 };
 
 const TOOLBOX = [
@@ -312,7 +327,8 @@ const PRINCIPLES = [
 const BUILDS = [
   {
     slug: "chief-of-stuff", name: "Chief of Stuff", status: "live", tile: "#2DD4BF",
-    one: "Tasks, shopping, meals, and workouts on one dense screen.",
+    one: "A personal command center. Tasks on a dense kanban with Week and Today views, a shopping system that remembers every store, a full meal planner with Sunday batch-prep sequencing, and workouts dropped straight onto the week. It works offline, syncs when the signal is back, and takes a live feed from an always-on assistant.",
+    caps: ["Kanban, Week and Today views", "Meal planner with batch prep", "Shopping lists per store", "Workouts on the calendar", "Offline-first, installs to the phone", "Fed by an always-on assistant"],
     stack: ["React + Vite", "Express", "Replit", "Postgres", "Installed PWA"],
     builtWith: "Replit, from briefs written in Claude",
     demo: "demo/chief-of-stuff/", demoPreview: "https://claude.ai/artifact/Key4ocAfdXskRye5et5ehi", live: null,
@@ -331,7 +347,8 @@ const BUILDS = [
   },
   {
     slug: "calibrate", name: "Calibrate", status: "live", tile: "#E0A52E",
-    one: "A daily prediction journal that scores how well you think.",
+    one: "A judgment gym. Log predictions with a confidence number, resolve them when they land, and watch your Brier score and calibration curve move across a 12-week plan of daily drills, conversation debriefs, and weekly reviews, with a six-tool playbook in your pocket.",
+    caps: ["Brier score and calibration buckets", "12-week plan with live reps", "Conversation debriefs", "Weekly and monthly reviews", "Six-tool playbook"],
     stack: ["Replit", "Installed PWA"], builtWith: "Replit, from briefs written in Claude", demo: "demo/calibrate/", demoPreview: "https://claude.ai/artifact/Hg8SxWRX22yjt3MsbJjXZ1", live: null, hero: "img/calibrate/hero.jpg", heroPhone: "img/calibrate/m-hero.jpg", primary: "phone",
     why: "I wanted to get better at thinking, not just at knowing things. The only honest way to measure that is to write predictions down with a confidence number, score them when they resolve, and look at the pattern over months. Calibrate turns that into a two-minute daily habit.",
     features: [
@@ -345,7 +362,8 @@ const BUILDS = [
   },
   {
     slug: "orbit", name: "Orbit", status: "live", tile: "#9B8CF5",
-    one: "Scores your friendships by what they give you, and shows where the gaps are.",
+    one: "A reflection tool for friendships, not a ranking. Score each friend across eight kinds of connection, see which categories are well covered and which are thin, journal the moments that mattered, and compare dated snapshots to watch the picture change over a year.",
+    caps: ["Eight-category coverage map", "Heatmap and radar views", "Touchpoint journal", "Dated snapshots to compare", "Syncs across devices"],
     stack: ["Replit", "Hosted with login"], builtWith: "Replit, from briefs written in Claude", demo: "demo/orbit/", demoPreview: "https://claude.ai/artifact/Jr34dbVL7TZVdYctjFjzz7", live: null, hero: "img/orbit/hero.jpg", heroPhone: "img/orbit/m-hero.jpg",
     why: "Most people grade friendships by closeness. I wanted to grade them by what they actually cover: who's there for fun, who's there when things are hard, who pushes me to grow. Scoring by category makes it obvious where life is well covered and where it's thin, which is a much more useful thing to know than who I text most.",
     features: [
@@ -359,7 +377,8 @@ const BUILDS = [
   },
   {
     slug: "keel", name: "Keel", status: "live", tile: "#5CA8D9",
-    one: "A sobriety tracker that keeps a steady count without the lectures.",
+    one: "A private recovery companion. Day counts that survive a slip, if-then playbooks for the ten riskiest situations, an SOS mode for riding out a craving, support contacts with check-in cadences, a published recovery-capital assessment, and a one-tap summary to bring to a therapist.",
+    caps: ["Counts that survive a slip", "If-then playbooks", "SOS craving mode", "Support contacts and meetings", "Recovery-capital assessment", "Therapist summary"],
     stack: ["Replit", "Installed PWA", "Standalone and private"], builtWith: "Replit, from briefs written in Claude", demo: "demo/keel/", demoPreview: "https://claude.ai/artifact/1GB9YhA9tpAE6TmC5Phqjr", live: null, hero: "img/keel/hero.jpg", heroPhone: "img/keel/m-hero.jpg", primary: "phone",
     why: "A keel steadies a boat without steering it. Most sobriety apps are either a bare day counter or a social feed. Keel is a quiet dashboard: honest numbers, milestones grounded in established research, and no lecture when a day resets. It's built for someone who likes a tool and some data to see what they've done and what's next.",
     features: [
@@ -373,7 +392,8 @@ const BUILDS = [
   },
   {
     slug: "lions", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
-    one: "A modern site for a 40-member service club, with a 24-day fundraiser built in.",
+    one: "A real front door for a 40-member service club. Meetings, causes, events, photos, and how to join, plus a 24-day advent-calendar fundraiser with a daily winner reveal, all on one fast page built for phones first.",
+    caps: ["24-door fundraiser grid", "Daily winner reveal", "Causes, events and photos", "Phone-first layout", "No framework, one file"],
     stack: ["Static HTML", "Single page", "Custom domain"], builtWith: "Claude, iterated as mockups", demo: null, live: "https://nephillylions.org", hero: "img/lions/hero.jpg", heroPhone: "img/lions/m-about.jpg",
     why: "The club's site was a 2000s-era template: nested tables, bold text everywhere, nothing that worked on a phone. A family member asked for help. The redesign gives the club a real front door, and the advent-calendar section turns a paper raffle into something members and buyers can follow online in December.",
     features: [
@@ -388,7 +408,8 @@ const BUILDS = [
   },
   {
     slug: "arc", name: "ARC", status: "mockup", tile: "#C9705A",
-    one: "A marketing-site concept for an executive-mentorship practice, taken through nine complete mockups.",
+    one: "A marketing-site concept for an executive-mentorship practice. Nine views in a single file, an explorable four-phase method, a pitch that changes with the student's stage, and a plain-spoken scorecard, iterated through nine complete, clickable mockups.",
+    caps: ["Nine views, one file", "Explorable four-phase method", "Stage-specific pitch", "Scorecard", "Clickable mockup rounds"],
     stack: ["Static HTML", "Nine views, one file", "Embedded images"], builtWith: "Claude, nine mockup rounds", demo: null, live: null, hero: "img/arc/hero.jpg", heroPhone: "img/arc/m-home.jpg",
     why: "ARC pairs students, from middle school through college, with global executives as one-on-one mentors. The design problem was explaining a premium, high-touch service to parents without sounding like every other college counselor. I worked through nine complete, clickable mockups until the structure and the voice were right.",
     features: [
@@ -422,18 +443,21 @@ function deviceBar(url) { return `<div class="bar"><i></i><i></i><i></i><span cl
 
 function renderHome() {
   document.title = "Quiet Operator";
-  const d = SITE.heroDemo;
-  const useFrame = !PREVIEW && window.matchMedia("(min-width: 861px)").matches;
-  const screen = useFrame
-    ? `<iframe src="${esc(d.url)}" title="${esc(d.label)}" loading="lazy"></iframe>`
-    : d.shots.map((s, i) => `<img src="${esc(s)}" alt="" class="${i === 0 ? "on" : ""}" data-i="${i}">`).join("");
-  const rows = BUILDS.map((b, i) => `
-    <a class="row reveal" style="--i:${i + 4}" href="#/builds/${b.slug}">
-      ${thumb(b)}
-      <span class="name">${esc(b.name)}${b.subtitle ? `<small>${esc(b.subtitle)}</small>` : ""}</span>
-      <span class="job">${esc(b.one)}</span>
-      ${lamp(b.status)}
-      <span class="open">Open</span>
+  const apps = SITE.heroApps.map((slug) => BUILDS.find((b) => b.slug === slug)).filter(Boolean);
+  const live = !PREVIEW && window.matchMedia("(min-width: 861px)").matches;
+  const tabs = apps.map((b, k) => `<button type="button" role="tab" aria-selected="${k === 0}" data-slug="${b.slug}" style="--dot:${esc(b.tile)}"><i></i>${esc(b.name)}</button>`).join("");
+  const cards = BUILDS.map((b, k) => `
+    <a class="card reveal${k === 0 ? " wide" : ""}" style="--accent:${esc(b.tile || "#2DD4BF")};--i:${k + 4}" href="#/builds/${b.slug}">
+      <div class="card-media">
+        ${b.hero ? `<img class="shot" src="${esc(b.hero)}" alt="" loading="lazy">` : `<div class="tilebg"><b>${esc(initials(b.name))}</b></div>`}
+        ${b.heroPhone ? `<img class="shot-p" src="${esc(b.heroPhone)}" alt="" loading="lazy">` : ""}
+      </div>
+      <div class="card-body">
+        <div class="card-top"><h3>${esc(b.name)}</h3>${lamp(b.status)}</div>
+        <p>${esc(b.one)}</p>
+        ${b.caps ? `<ul class="caps">${b.caps.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+        <span class="open">${b.demo ? "Open the build and try the demo" : b.live ? "Open the build and visit the site" : "Open the build"}</span>
+      </div>
     </a>`).join("");
   const tools = TOOLBOX.map(([t, c]) => `<div class="tool"><dt>${esc(t)}</dt><dd>${esc(c)}</dd></div>`).join("");
   const rules = PRINCIPLES.map(([t, c]) => `<li><b>${esc(t)}.</b> ${esc(c)}</li>`).join("");
@@ -443,26 +467,18 @@ function renderHome() {
         <h1 class="reveal" style="--i:0">${esc(SITE.headline)}</h1>
         <p class="lede reveal" style="--i:1">${esc(SITE.lede)}</p>
         <div class="cta reveal" style="--i:2">
-          ${PREVIEW ? `<a class="btn" href="${esc(BUILDS.find((x) => x.slug === d.slug).demoPreview)}" target="_blank" rel="noopener">Open a live demo</a>` : `<a class="btn" href="${esc(d.url)}">Open a live demo</a>`}
+          ${PREVIEW ? `<a class="btn" href="${esc(apps[0].demoPreview || "#/builds/" + apps[0].slug)}" target="_blank" rel="noopener">Open a live demo</a>` : `<a class="btn" href="${esc(apps[0].demo)}" id="hero-open">Open this demo</a>`}
           <a class="btn ghost" href="#builds">See all six</a>
         </div>
       </div>
-      <div class="reveal" style="--i:2">
-        <div class="device" id="hero-device">
-          ${deviceBar("quietoperator.ai/" + d.url)}
-          <div class="screen">${screen}</div>
-        </div>
-        <div class="cap">
-          <span>${esc(d.label)}${useFrame ? ", click around" : ""}</span>
-          ${useFrame ? "" : `<span class="dots" id="hero-dots">${d.shots.map((_, i) => `<i class="${i === 0 ? "on" : ""}" data-i="${i}" role="button" aria-label="Screenshot ${i + 1}"></i>`).join("")}</span>`}
-          <span>Sample data. Resets on reload.</span>
-        </div>
+      <div class="hero-visual reveal" style="--i:2" id="hero-visual">
+        <div class="apptabs" role="tablist" aria-label="Choose an app">${tabs}</div>
+        <div class="hero-stage" id="hero-stage"></div>
+        <div class="cap"><span id="hero-cap"></span><div class="viewtoggle" id="hero-mode"><button type="button" data-mode="desktop" aria-pressed="true">Desktop</button><button type="button" data-mode="phone" aria-pressed="false">Phone</button></div></div>
       </div>
     </section>
-    <section class="board" id="builds" aria-label="Builds">
-      <div class="board-head reveal" style="--i:3"><span>Six builds</span><span>Live, mockup, or paused, the lamp says which</span></div>
-      ${rows}
-    </section>
+    <div class="grid-head reveal" style="--i:3" id="builds"><h2>Six builds</h2><span>Live, mockup, or paused, the lamp says which</span></div>
+    <section class="grid" aria-label="Builds">${cards}</section>
     <section class="how reveal" style="--i:10">
       <div class="how-head">
         <h2>How I build</h2>
@@ -479,16 +495,37 @@ function renderHome() {
       </div>
     </section>`;
   window.scrollTo(0, 0);
-  if (!useFrame) {
-    const imgs = [...app.querySelectorAll("#hero-device img")];
-    const dots = [...app.querySelectorAll("#hero-dots i")];
-    let cur = 0, timer = null;
-    const show = (i) => { cur = i; imgs.forEach((im, k) => im.classList.toggle("on", k === i)); dots.forEach((dt, k) => dt.classList.toggle("on", k === i)); };
-    const start = () => { stop(); if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show((cur + 1) % imgs.length), 3800); };
-    const stop = () => { if (timer) clearInterval(timer); timer = null; };
-    dots.forEach((dt) => dt.addEventListener("click", () => { show(Number(dt.dataset.i)); start(); }));
-    start(); cleanup.push(stop);
-  }
+
+  // hero: app tabs + desktop / phone, live when the demos are on the same site
+  let cur = apps[0], mode = "desktop";
+  const stage = app.querySelector("#hero-stage"), cap = app.querySelector("#hero-cap"), visual = app.querySelector("#hero-visual"), openBtn = app.querySelector("#hero-open");
+  const paint = () => {
+    visual.style.setProperty("--accent", cur.tile || "#2DD4BF");
+    cap.textContent = live ? `${cur.name}, running on sample data. Click around.` : `${cur.name}, on sample data.`;
+    if (openBtn) openBtn.href = cur.demo;
+    if (mode === "phone") {
+      const scale = Math.min(1, (Math.min(stage.clientWidth, 520)) / 412, 0.62);
+      stage.innerHTML = live
+        ? `<div class="live-wrap" style="width:${412 * scale}px;height:${892 * scale}px"><div class="phone live" style="transform:scale(${scale})"><div class="scr"><iframe src="${esc(cur.demo)}" title="${esc(cur.name)} demo at phone size" loading="lazy"></iframe></div></div></div>`
+        : `<div class="phone"><div class="scr"><img class="on" src="${esc(cur.heroPhone || cur.hero)}" alt="${esc(cur.name)} on a phone"></div></div>`;
+    } else {
+      stage.innerHTML = `<div class="device">${deviceBar("quietoperator.ai/" + (cur.demo || ""))}<div class="screen">${live ? `<iframe src="${esc(cur.demo)}" title="${esc(cur.name)} demo" loading="lazy"></iframe>` : `<img class="on" src="${esc(cur.hero)}" alt="${esc(cur.name)}">`}</div></div>`;
+    }
+  };
+  app.querySelectorAll(".apptabs button").forEach((t) => t.addEventListener("click", () => {
+    cur = apps.find((b) => b.slug === t.dataset.slug);
+    app.querySelectorAll(".apptabs button").forEach((x) => x.setAttribute("aria-selected", String(x === t)));
+    paint();
+  }));
+  app.querySelectorAll("#hero-mode button").forEach((x) => x.addEventListener("click", () => {
+    mode = x.dataset.mode; app.querySelectorAll("#hero-mode button").forEach((y) => y.setAttribute("aria-pressed", String(y === x))); paint();
+  }));
+  paint();
+
+  // cards: spotlight follows the pointer
+  const onMove = (e) => { const c = e.target.closest(".card"); if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty("--mx", `${e.clientX - r.left}px`); c.style.setProperty("--my", `${e.clientY - r.top}px`); };
+  app.addEventListener("pointermove", onMove);
+  cleanup.push(() => app.removeEventListener("pointermove", onMove));
 }
 
 function renderBuild(slug) {
@@ -537,7 +574,7 @@ function renderBuild(slug) {
       <div>
         <h1>${esc(b.name)}${b.subtitle ? `<small>${esc(b.subtitle)}</small>` : ""}</h1>
         <p class="one">${esc(b.one)}</p>
-        <div class="chips">${b.stack.map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div>
+        <div class="chips">${(b.caps || b.stack).map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div>
       </div>
       <div class="meta">
         ${lamp(b.status)}
@@ -575,7 +612,7 @@ function renderBuild(slug) {
       <h2>Under the hood</h2>
       <details>
         <summary>Stack, process, and what was hard</summary>
-        <div class="inner"><p>${esc(b.hood)}</p></div>
+        <div class="inner"><div class="chips" style="margin-bottom:.9rem">${b.stack.map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div><p>${esc(b.hood)}</p></div>
       </details>
     </section>
 
