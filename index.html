@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiet Operator</title>
+<meta name="description" content="Quiet Operator is Bill Wagner's workshop: small software built with AI, running every day, open to try with sample data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ---------- tokens ---------- */
+  :root {
+    --bg: #EEF0EC; --surface: #F8F9F7; --surface-2: #E4E7E2;
+    --ink: #1F2422; --muted: #5E6763; --line: #CDD2CC; --line-strong: #9BA39D;
+    --accent: #1D5D63; --accent-ink: #F2F7F7;
+    --lamp-live: #2E8B57; --lamp-client: #3C6FB1; --lamp-paused: #C98A12;
+    --frame: #0F1417; --frame-bar: #1A2124; --frame-ink: #AEB6B1;
+    --grid: rgba(31, 36, 34, .09);
+    --focus: #1D5D63;
+    --display: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15181A; --surface: #1C2023; --surface-2: #242A2D;
+      --ink: #E8EAE6; --muted: #9AA39E; --line: #2E3539; --line-strong: #4A5358;
+      --accent: #7CC4C9; --accent-ink: #0F1D1F;
+      --lamp-live: #4DBF7D; --lamp-client: #6E9FE0; --lamp-paused: #E0A52E;
+      --frame: #0B0E10; --frame-bar: #161B1E; --frame-ink: #8F9994;
+      --grid: rgba(232, 234, 230, .07);
+      --focus: #7CC4C9;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15181A; --surface: #1C2023; --surface-2: #242A2D;
+    --ink: #E8EAE6; --muted: #9AA39E; --line: #2E3539; --line-strong: #4A5358;
+    --accent: #7CC4C9; --accent-ink: #0F1D1F;
+    --lamp-live: #4DBF7D; --lamp-client: #6E9FE0; --lamp-paused: #E0A52E;
+    --frame: #0B0E10; --frame-bar: #161B1E; --frame-ink: #8F9994;
+    --grid: rgba(232, 234, 230, .07);
+    --focus: #7CC4C9;
+  }
+  html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px); scroll-behavior: smooth; overflow-x: clip; }
+  *, *::before, *::after { box-sizing: inherit; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--accent); text-decoration: none; text-underline-offset: 3px; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 3px; }
+
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.06; margin: 0; }
+  h1 { font-size: clamp(2.2rem, 5.4vw, 3.9rem); font-variation-settings: "opsz" 96; }
+  h2 { font-size: clamp(1.45rem, 2.6vw, 1.9rem); font-variation-settings: "opsz" 48; }
+  h3 { font-size: 1.1rem; line-height: 1.25; }
+  p { margin: 0 0 1em; max-width: 66ch; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ---------- motion: one page-load reveal, nothing else unprompted ---------- */
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .reveal { opacity: 0; animation: rise .55s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(var(--i, 0) * 70ms); }
+  @keyframes lamp { 0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp-live) 22%, transparent); } 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--lamp-live) 10%, transparent); } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .reveal { opacity: 1; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ---------- shell ---------- */
+  .wrap { width: min(1080px, calc(100% - 2.5rem)); margin: 0 auto; }
+  .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { font-family: var(--display); font-weight: 700; font-size: 1.05rem; color: var(--ink); letter-spacing: -0.01em; display: inline-flex; align-items: center; gap: .55rem; }
+  .brand:hover { text-decoration: none; }
+  .brand .mark { width: 11px; height: 11px; border: 2px solid var(--ink); border-radius: 50%; position: relative; }
+  .brand .mark::after { content: ""; position: absolute; inset: 2px; background: var(--ink); border-radius: 50%; }
+  .nav { display: flex; gap: 1.4rem; }
+  .nav a { color: var(--muted); font-weight: 500; font-size: .95rem; }
+  .nav a.on, .nav a:hover { color: var(--ink); text-decoration: none; }
+  main { padding: 0 0 5rem; }
+  footer { border-top: 1px solid var(--line); padding: 1.6rem 0 2.2rem; color: var(--muted); font-size: .92rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: .8rem 2rem; justify-content: space-between; }
+
+  /* ---------- lamps, buttons, chips ---------- */
+  .lamp { display: inline-flex; align-items: center; gap: .45rem; font-size: .88rem; color: var(--muted); font-weight: 500; white-space: nowrap; }
+  .lamp::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--lamp-live); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp-live) 22%, transparent); animation: lamp 3.2s ease-in-out infinite; }
+  .lamp.client::before { background: var(--lamp-client); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp-client) 22%, transparent); animation: none; }
+  .lamp.paused::before { background: var(--lamp-paused); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp-paused) 22%, transparent); animation: none; }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.1rem; border-radius: 7px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); font-weight: 600; font-size: .95rem; line-height: 1; cursor: pointer; font-family: var(--body); transition: background .15s, border-color .15s, transform .15s; }
+  .btn:hover { text-decoration: none; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--ink); border-color: var(--ink); }
+  .btn.soon { background: transparent; color: var(--muted); border-style: dashed; border-color: var(--line-strong); cursor: default; }
+  .btn.soon:hover { background: transparent; color: var(--muted); border-color: var(--line-strong); }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chip { font-size: .8rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .18rem .6rem; background: var(--surface); }
+
+  /* ---------- device frame (browser window) ---------- */
+  .device { background: var(--frame); border-radius: 12px; border: 1px solid color-mix(in srgb, var(--frame) 60%, var(--line-strong)); box-shadow: 0 30px 60px -30px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.04) inset; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+  .device .bar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--frame-bar); border-bottom: 1px solid rgba(255,255,255,.06); }
+  .device .bar i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.16); }
+  .device .bar .url { margin-left: 8px; flex: 1; max-width: 360px; font-size: 11px; color: var(--frame-ink); background: rgba(255,255,255,.05); border-radius: 5px; padding: 4px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .device .screen { position: relative; aspect-ratio: 16 / 10; background: #0D1220; overflow: hidden; }
+  .device .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; opacity: 0; transition: opacity .6s ease; }
+  .device .screen img.on { opacity: 1; }
+  .device .screen iframe { position: absolute; top: 0; left: 0; width: 161.3%; height: 161.3%; border: 0; transform: scale(.62); transform-origin: 0 0; background: #0D1220; }
+  .device .screen .tile { position: absolute; inset: 0; display: grid; place-items: center; color: var(--frame-ink); }
+  .device .screen .tile b { font-family: var(--display); font-size: clamp(2rem, 6vw, 4rem); font-weight: 700; letter-spacing: -0.03em; color: var(--tile, #2DD4BF); }
+
+  /* ---------- home: hero ---------- */
+  .hero { position: relative; padding: 3.6rem 0 2.6rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 2.4rem 3.5rem; align-items: center; }
+  .hero::before { content: ""; position: absolute; inset: -1px -1.25rem 0; z-index: -1; pointer-events: none;
+    background-image: radial-gradient(var(--grid) 1px, transparent 1.2px); background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 60% 40%, #000 30%, transparent 75%); mask-image: radial-gradient(ellipse 70% 80% at 60% 40%, #000 30%, transparent 75%); }
+  .hero h1 { max-width: 13ch; }
+  .hero .lede { font-size: 1.12rem; color: var(--muted); max-width: 46ch; margin: 1.1rem 0 1.5rem; }
+  .hero .cta { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .hero .cap { margin-top: .75rem; font-size: .85rem; color: var(--muted); display: flex; gap: .5rem 1.2rem; flex-wrap: wrap; align-items: center; }
+  .hero .cap .dots { display: inline-flex; gap: 5px; }
+  .hero .cap .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-strong); cursor: pointer; }
+  .hero .cap .dots i.on { background: var(--ink); }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 2.4rem; } .hero h1 { max-width: 16ch; } }
+
+  /* ---------- home: status board ---------- */
+  .board { border-top: 1px solid var(--line-strong); margin-top: 1.5rem; }
+  .board-head { display: flex; justify-content: space-between; align-items: baseline; padding: 1.2rem 0 .4rem; color: var(--muted); font-size: .9rem; }
+  .row { display: grid; grid-template-columns: 104px 1.1fr 2fr auto auto; gap: 1.4rem; align-items: center; padding: .9rem 0; border-bottom: 1px solid var(--line); color: inherit; position: relative; transition: background .15s; }
+  .row::before { content: ""; position: absolute; inset: 0 -1.2rem; background: var(--surface); opacity: 0; border-radius: 10px; z-index: -1; transition: opacity .15s; }
+  .row:hover { text-decoration: none; }
+  .row:hover::before { opacity: 1; }
+  .thumb { width: 104px; aspect-ratio: 16 / 10; border-radius: 6px; overflow: hidden; background: var(--frame); border: 1px solid color-mix(in srgb, var(--frame) 70%, var(--line-strong)); display: grid; place-items: center; transition: transform .2s; }
+  .row:hover .thumb { transform: translateY(-1px) scale(1.03); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  .thumb b { font-family: var(--display); font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; color: var(--tile, #2DD4BF); }
+  .row .name { font-family: var(--display); font-weight: 600; font-size: 1.28rem; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .row .name small { font-family: var(--body); font-weight: 400; font-size: .82rem; color: var(--muted); letter-spacing: 0; }
+  .row .job { color: var(--muted); font-size: 1rem; max-width: 44ch; }
+  .row .open { font-weight: 600; color: var(--ink); font-size: .95rem; transition: transform .15s; }
+  .row:hover .open { color: var(--accent); transform: translateX(2px); }
+  @media (max-width: 760px) {
+    .row { grid-template-columns: 84px 1fr auto; grid-template-areas: "thumb name lamp" "thumb job job"; gap: .25rem 1rem; align-items: start; }
+    .thumb { grid-area: thumb; width: 84px; margin-top: .2rem; }
+    .row .name { grid-area: name; font-size: 1.15rem; }
+    .row .job { grid-area: job; font-size: .93rem; }
+    .row .lamp { grid-area: lamp; }
+    .row .open { display: none; }
+  }
+
+  /* ---------- home: pipeline ---------- */
+  .how { margin-top: 4.5rem; }
+  .how h2 { max-width: 14ch; margin-bottom: 1.6rem; }
+  .pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; counter-reset: step; }
+  .pipe::before { content: ""; position: absolute; left: 10px; right: 10px; top: 10px; height: 1px; background: var(--line-strong); }
+  .pipe > div { position: relative; padding-top: 1.6rem; }
+  .pipe > div::before { content: ""; position: absolute; left: 0; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink); }
+  .pipe dt { font-weight: 600; font-size: 1.02rem; margin-bottom: .3rem; }
+  .pipe dd { margin: 0; color: var(--muted); font-size: .95rem; max-width: 32ch; }
+  @media (max-width: 760px) { .pipe { grid-template-columns: 1fr; gap: 1.1rem; } .pipe::before { left: 5px; right: auto; top: 10px; bottom: 10px; width: 1px; height: auto; } .pipe > div { padding-top: 0; padding-left: 1.6rem; } .pipe > div::before { top: 6px; } }
+
+  .about-teaser { margin-top: 4.5rem; padding-top: 2rem; border-top: 1px solid var(--line-strong); display: grid; grid-template-columns: 1fr 2fr; gap: 1rem 3rem; }
+  @media (max-width: 760px) { .about-teaser { grid-template-columns: 1fr; } }
+
+  /* ---------- build page ---------- */
+  .page { padding-top: 2.6rem; }
+  .crumb { font-size: .92rem; color: var(--muted); margin-bottom: 1.6rem; display: inline-block; }
+  .crumb:hover { color: var(--ink); }
+  .bhead { display: grid; grid-template-columns: 1fr auto; gap: 1.2rem 2rem; align-items: end; padding-bottom: 1.8rem; }
+  .bhead h1 { display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap; }
+  .bhead h1 small { font-family: var(--body); font-weight: 400; font-size: .95rem; color: var(--muted); letter-spacing: 0; line-height: 1.3; }
+  .bhead .one { font-size: 1.22rem; color: var(--muted); margin: .7rem 0 1rem; max-width: 48ch; }
+  .bhead .meta { display: grid; gap: .7rem; justify-items: start; }
+  .bhead .actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+  .bhead .note { font-size: .82rem; color: var(--muted); }
+  @media (max-width: 760px) { .bhead { grid-template-columns: 1fr; } }
+  .heroshot { margin-bottom: 1rem; }
+
+  .sec { padding: 2.6rem 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 2.4fr; gap: .8rem 3rem; }
+  .sec > h2 { max-width: 14ch; }
+  .sec .body { font-size: 1.05rem; }
+  .sec.wide { grid-template-columns: 1fr; gap: 1.4rem; }
+  @media (max-width: 760px) { .sec { grid-template-columns: 1fr; } }
+
+  /* scroll story: steps on the left, one sticky frame on the right */
+  .story { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem 3rem; align-items: start; }
+  .steps { display: grid; }
+  .step { padding: 1.4rem 0; border-top: 1px solid var(--line); opacity: .5; transition: opacity .35s; cursor: default; }
+  .step:first-child { border-top: 0; }
+  .step.on { opacity: 1; }
+  .step h3 { margin-bottom: .35rem; }
+  .step p { color: var(--muted); }
+  .step .mshot { display: none; margin-top: 1rem; }
+  .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); }
+  .stage .device .screen { aspect-ratio: 16 / 10; }
+  .stage .label { margin-top: .6rem; font-size: .85rem; color: var(--muted); min-height: 1.3em; }
+  .mini { background: var(--frame); border-radius: 10px; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid color-mix(in srgb, var(--frame) 70%, var(--line-strong)); display: grid; place-items: center; color: var(--frame-ink); font-size: .85rem; }
+  .mini img { width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  @media (max-width: 900px) {
+    .story { grid-template-columns: 1fr; }
+    .stage { display: none; }
+    .step { opacity: 1; }
+    .step .mshot { display: block; }
+  }
+
+  .week { font-family: var(--display); font-weight: 500; font-size: clamp(1.15rem, 2vw, 1.4rem); line-height: 1.38; letter-spacing: -0.01em; max-width: 40ch; font-variation-settings: "opsz" 24; }
+  details { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: .3rem 0; }
+  details summary { cursor: pointer; font-weight: 600; padding: .8rem 0; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after { content: "+"; font-family: var(--display); font-size: 1.3rem; color: var(--muted); }
+  details[open] summary::after { content: "–"; }
+  details .inner { padding: 0 0 1.2rem; color: var(--muted); }
+  details .inner p { max-width: 70ch; }
+
+  .pager { display: flex; justify-content: space-between; gap: 1rem; padding-top: 2rem; border-top: 1px solid var(--line); margin-top: 1rem; }
+  .pager a { color: var(--ink); font-weight: 600; }
+  .pager a span { display: block; font-weight: 400; color: var(--muted); font-size: .85rem; }
+  .pager .next { text-align: right; }
+
+  /* ---------- about ---------- */
+  .about { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem 3rem; }
+  .about .body { font-size: 1.08rem; }
+  .about .tools { margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
+  .about .tools h3 { margin-top: 1.4rem; margin-bottom: .4rem; }
+  .about .tools h3:first-child { margin-top: 0; }
+  @media (max-width: 760px) { .about { grid-template-columns: 1fr; } }
+  .placeholder { background: var(--surface-2); border: 1px dashed var(--line-strong); border-radius: 6px; padding: .2rem .5rem; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#/"><span class="mark" aria-hidden="true"></span>Quiet Operator</a>
+    <nav class="nav" aria-label="Site">
+      <a href="#/" data-nav="home">Builds</a>
+      <a href="#/about" data-nav="about">About</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app" class="wrap" aria-live="polite"></main>
+
+<footer>
+  <div class="wrap">
+    <span>Quiet Operator is Bill Wagner's workshop.</span>
+    <span>Demos run on sample data and reset when you reload.</span>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   CONTENT — edit this block to change anything on the site.
+   Each build: slug, name, (subtitle), status (live | client | paused), tile color,
+   one-liner, stack chips, how it was built, demo/live links, hero screenshot,
+   why, features [title, description, caption, screenshot], week narrative, hood.
+   ===================================================================== */
+const SITE = {
+  headline: "Small software, built to be used every day.",
+  lede: "I'm Bill. I design and ship personal tools and websites with AI, then run them on myself. Everything here is real and running. Open any of them and try it with sample data.",
+  heroDemo: { slug: "chief-of-stuff", url: "demo/chief-of-stuff/", label: "Live demo · Chief of Stuff",
+    shots: ["img/chief-of-stuff/dashboard.jpg", "img/chief-of-stuff/week.jpg", "img/chief-of-stuff/meals-week.jpg", "img/chief-of-stuff/shopping.jpg"] },
+};
+
+const HOW = [
+  ["Think with Claude", "Every build starts as a conversation: what problem, what the smallest useful version is, what to leave out. Claude also drafts the build prompts and most of the words on this site."],
+  ["Build in Replit", "Apps are built by prompting Replit Agent one feature at a time, with a screenshot review after every pass. No hand-written code."],
+  ["Sites by hand", "Websites are single HTML files, iterated as numbered mockups until they're right, then hosted as plain static pages."],
+  ["Ship small, keep using", "Nothing here is a concept. The status lamp next to each build is honest: if something is paused or handed off, it says so."],
+];
+
+const BUILDS = [
+  {
+    slug: "chief-of-stuff", name: "Chief of Stuff", status: "live", tile: "#2DD4BF",
+    one: "Tasks, shopping, meals, and workouts on one dense screen.",
+    stack: ["React + Vite", "Express", "Replit", "Postgres", "Installed PWA"],
+    builtWith: "Replit Agent and Claude",
+    demo: "demo/chief-of-stuff/", demoPreview: "https://claude.ai/artifact/Key4ocAfdXskRye5et5ehi", live: null,
+    hero: "img/chief-of-stuff/dashboard.jpg",
+    why: "I had tasks in one app, groceries in another, meal plans in a notes file, and a workout schedule in my head. None of them talked to each other, and all of them wanted to look nice instead of fitting on one screen. Chief of Stuff is the opposite: one compact, dark board that holds the whole week, built for a phone in a grocery aisle as much as for a desk.",
+    features: [
+      ["Board, Week, Today", "Every task lives on a kanban with four statuses and five fixed lanes: Cleaning, Home, Household Projects, Admin, and Follow-ups. Schedule a task onto a day and it appears in the Week and Today views; priority is a thin colored stripe, not a badge.", "Week view with scheduled tasks", "img/chief-of-stuff/week.jpg"],
+      ["Shopping that remembers", "Provisions is a standing list per store. Checking an item off parks it in a library for one-tap reactivation instead of deleting it. Buy List and Considering hold everything else, and Shop mode is the big-tap in-store view.", "Shopping and Shop mode on a phone", "img/chief-of-stuff/mobile-shop-mode.jpg"],
+      ["Meals", "A recipe library, a seven-day grid where a slot can hold a main and sides, Sunday batch-prep sequencing, rough macros per day, and a shopping list that sends straight into Buy List.", "Next week's meal grid", "img/chief-of-stuff/meals-week.jpg"],
+      ["Workouts on the week", "Workout templates sit in a collapsible row inside the Week view. Drag one onto a day and the change pushes to the calendar.", "Workouts row in Week view", "img/chief-of-stuff/workouts.jpg"],
+      ["Dashboard", "The landing screen: today's tasks, tonight's meal, calendar, news briefs, and learning items, fed by an always-on assistant through the API.", "Dashboard", "img/chief-of-stuff/dashboard.jpg"],
+      ["Works offline, lives on the home screen", "Installed as a PWA. Snapshots and a mutation queue mean it keeps working in a store with no signal and syncs when it's back.", "Dashboard and Today on an iPhone", "img/chief-of-stuff/mobile-today.jpg"],
+    ],
+    week: "Sunday night I fill the meal grid and send the list to Buy List. Monday morning the Dashboard shows what's due, what's for dinner, and what the assistant pulled from my calendar. Through the week I work from Today, drag the odd task to another day, and check off groceries in Shop mode. Saturday I clear the board.",
+    hood: "A pnpm workspace with a React and Vite frontend, an Express API, Replit key-value storage for tasks and shopping, and Postgres for meals. The browser never holds an API key; the always-on assistant that feeds the Dashboard uses a server-side key instead. Nearly every line was produced by prompting Replit Agent, with Claude used to think through each feature and write the prompt first. The demo on this site is the real production build with its API calls answered from sample data in the browser.",
+  },
+  {
+    slug: "calibrate", name: "Calibrate", status: "live", tile: "#E0A52E",
+    one: "A daily prediction journal that scores how well you think.",
+    stack: ["Replit", "Installed PWA"], builtWith: "Replit Agent and Claude", demo: "demo/calibrate/", demoPreview: "https://claude.ai/artifact/Hg8SxWRX22yjt3MsbJjXZ1", live: null, hero: "img/calibrate/hero.jpg",
+    why: "I wanted to get better at thinking, not just at knowing things. The only honest way to measure that is to write predictions down with a confidence number, score them when they resolve, and look at the pattern over months. Calibrate turns that into a two-minute daily habit.",
+    features: [
+      ["Log a prediction", "Write the call, attach a confidence percentage, and set when it resolves. A client meeting, a decision, a deadline, a hunch.", "New prediction entry", "img/calibrate/log.jpg"],
+      ["Score it later", "When a prediction resolves, mark it right or wrong. Calibrate keeps the ledger so you don't have to remember.", "Resolving a prediction", "img/calibrate/score.jpg"],
+      ["See your calibration", "Over time the chart shows whether your 80% calls land about 80% of the time, or whether you run hot or cautious.", "Calibration chart", "img/calibrate/stats.jpg"],
+      ["Frameworks in your pocket", "A short kit of thinking frameworks for structuring a problem before you commit to an answer.", "Frameworks list", "img/calibrate/playbook.jpg"],
+    ],
+    week: "Each morning I log one or two predictions about the day. Evenings I resolve whatever closed. On Sunday I look at the calibration chart and notice which kinds of calls I keep getting wrong.",
+    hood: "A single-user web app built in Replit and installed to the iPhone home screen from Safari. It's the measurement half of a 12-week plan to improve how I assess problems and respond in conversation; the frameworks live alongside the journal so the two reinforce each other.",
+  },
+  {
+    slug: "orbit", name: "Orbit", status: "live", tile: "#9B8CF5",
+    one: "Scores your friendships by what they give you, and shows where the gaps are.",
+    stack: ["Replit", "Hosted with login"], builtWith: "Replit Agent and Claude", demo: "demo/orbit/", demoPreview: "https://claude.ai/artifact/Jr34dbVL7TZVdYctjFjzz7", live: null, hero: "img/orbit/hero.jpg",
+    why: "Most people grade friendships by closeness. I wanted to grade them by what they actually cover: who's there for fun, who's there when things are hard, who pushes me to grow. Scoring by category makes it obvious where life is well covered and where it's thin, which is a much more useful thing to know than who I text most.",
+    features: [
+      ["Score each friend across eight categories", "Fun and play, adventure, emotional support, being known, growth, everyday companionship, practical reliability, and one more lens: how at ease you are around them without drinking. Each friend gets a 0 to 3 score in each.", "Scoring a friend", "img/orbit/score.jpg"],
+      ["See the gaps", "Totals by category, not by person. It's the difference between \"I have good friends\" and \"nobody in my life covers adventure right now.\"", "Category totals", "img/orbit/gaps.jpg"],
+      ["Log touchpoints", "After time with a friend, note three things: did you look forward to it, did you feel like yourself, did you leave with more energy. Patterns show up fast.", "Touchpoint journal", "img/orbit/touchpoints.jpg"],
+      ["Synced between phone and desktop", "Hosted with a login so entries made on the phone after dinner show up on the laptop on Sunday.", "Snapshots saved to your account", "img/orbit/snapshots.jpg"],
+    ],
+    week: "After a dinner I log the touchpoint in thirty seconds. Once a month I look at the category totals and notice, say, that adventure is covered by one person and growth by no one. That tells me who to call, and who I've been meaning to meet.",
+    hood: "Built in Replit with Claude, hosted with a login so data persists across devices. The scoring framework came first, as a document; the app came second, once the framework proved useful on paper.",
+  },
+  {
+    slug: "keel", name: "Keel", status: "live", tile: "#5CA8D9",
+    one: "A sobriety tracker that keeps a steady count without the lectures.",
+    stack: ["Replit", "Installed PWA", "Standalone and private"], builtWith: "Replit Agent and Claude", demo: "demo/keel/", demoPreview: "https://claude.ai/artifact/1GB9YhA9tpAE6TmC5Phqjr", live: null, hero: "img/keel/hero.jpg",
+    why: "A keel steadies a boat without steering it. Most sobriety apps are either a bare day counter or a social feed. Keel is a quiet dashboard: honest numbers, milestones grounded in established research, and no lecture when a day resets. It's built for someone who likes a tool and some data to see what they've done and what's next.",
+    features: [
+      ["Current run and all-time total", "A slip resets the day count but never erases the cumulative stats. Both numbers are always visible, because both are true.", "Home dashboard", "img/keel/run.jpg"],
+      ["What's been accomplished, what's next", "Milestones based on established research into recovery timelines, so the next marker always has a reason behind it.", "Milestones", "img/keel/milestones.jpg"],
+      ["Standalone by design", "No integrations with anything else. Keel doesn't talk to the task manager, the calendar, or an assistant. It's a separate, private place.", "Settings", "img/keel/standalone.jpg"],
+      ["Ten-second check-in", "Lives on the home screen. Open it, log the day, close it.", "Daily check-in", "img/keel/checkin.jpg"],
+    ],
+    week: "The morning check-in takes ten seconds. The dashboard shows the current run, the all-time total, and the next milestone. On a hard day it's a place to look at the numbers instead of arguing with them.",
+    hood: "A single-user web app built in Replit, installed as a PWA. The design decisions were made deliberately: a slip resets the streak but keeps cumulative statistics, and the app is intentionally not connected to any other tool in this collection. The demo uses invented sample data throughout.",
+  },
+  {
+    slug: "lions", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
+    one: "A modern site for a 40-member service club, with a 24-day fundraiser built in.",
+    stack: ["Static HTML", "Single page", "Custom domain"], builtWith: "Claude, iterated as mockups", demo: null, live: "https://nephillylions.org", hero: null,
+    why: "The club's site was a 2000s-era template: nested tables, bold text everywhere, nothing that worked on a phone. A family member asked for help. The redesign gives the club a real front door, and the advent-calendar section turns a paper raffle into something members and buyers can follow online in December.",
+    features: [
+      ["Everything a visitor needs on one page", "Who the club is, when and where it meets, the causes it supports, upcoming events, photos, and how to join. Guests are told to just show up.", "Home and meeting details"],
+      ["Advent calendar fundraiser", "A 24-door grid that reveals one winning number a day from December 1 to 24, a how-it-works explainer, and a prizes-and-donors list.", "The 24-door grid"],
+      ["Rules written in", "Calendars are sold in person for cash, check, or money order, with no online sales, because that's what the state's raffle rules allow. The site says so plainly.", "How it works"],
+      ["Built for phones first", "Most visitors arrive from a Facebook post. The layout, type, and tap targets start from that.", "Mobile layout"],
+    ],
+    weekLabel: "How it gets used",
+    week: "Members send prospective members to the site instead of a Facebook page. In December the club reveals one winner a day on the calendar grid, and buyers check their number from their phones.",
+    hood: "One static HTML file with its own CSS and a little JavaScript for the calendar grid and filters. No framework, no build step, nothing to maintain. Designed as a series of numbered mockups reviewed with the club before it went live.",
+  },
+  {
+    slug: "arc", name: "ARC", status: "client", tile: "#C9705A",
+    one: "Marketing site for an executive-mentorship practice, from first mockup to handoff.",
+    stack: ["Static HTML", "Nine views, one file", "Embedded images"], builtWith: "Claude, nine mockup rounds", demo: null, live: null, hero: null,
+    why: "ARC pairs students, from middle school through college, with global executives as one-on-one mentors. The founder needed a site that explained a premium, high-touch service to parents without sounding like every other college counselor. We worked through nine complete, clickable mockups until the structure and the voice were right.",
+    features: [
+      ["A whole site in one file", "Home, who it's for, method, stories, mentors, getting started, insights, and the legal pages, all as views inside a single HTML file so each round could be reviewed as a working site rather than a picture.", "Home view"],
+      ["The ARC framework, explorable", "The four-phase method, Discover, Strategize, Roadmap, Mentor and execute, laid out so a parent can click through what happens in each phase.", "Framework explorer"],
+      ["Built around the student's stage", "Middle school, high school, college, and international students each get their own panel, because the pitch is different for each.", "Stage tabs"],
+      ["A scorecard, not a sales pitch", "A side-by-side of what a standard counselor does and what ARC does, with a plain verdict at the bottom.", "Scorecard"],
+      ["One way in", "A discovery-session form that asks for the child's story first, with the questions parents actually get asked.", "Discovery form"],
+    ],
+    weekLabel: "How it gets used",
+    week: "Parents land from a referral, read the method, open the stage that matches their kid, and book a discovery session.",
+    hood: "A single self-contained HTML file with no framework and all images embedded, so it can be hosted anywhere. Typography is a serif for the editorial voice paired with a geometric sans for structure. Every mockup round shipped as a complete file, which made review a matter of opening it rather than imagining it. The showcase copy has the inquiry form disabled.",
+  },
+];
+
+/* ===================================================================== */
+
+const app = document.getElementById("app");
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const STATUS = { live: ["", "Live"], client: ["client", "Client build"], paused: ["paused", "Paused"] };
+const PREVIEW = !!window.__PREVIEW__;
+const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+let cleanup = [];
+
+function lamp(status) { const [cls, label] = STATUS[status] || STATUS.live; return `<span class="lamp ${cls}">${label}</span>`; }
+function thumb(b) {
+  if (b.hero) return `<span class="thumb"><img src="${esc(b.hero)}" alt="" loading="lazy"></span>`;
+  return `<span class="thumb" style="--tile:${esc(b.tile || "#2DD4BF")}"><b>${esc(initials(b.name))}</b></span>`;
+}
+function deviceBar(url) { return `<div class="bar"><i></i><i></i><i></i><span class="url">${esc(url)}</span></div>`; }
+
+function renderHome() {
+  document.title = "Quiet Operator";
+  const d = SITE.heroDemo;
+  const useFrame = !PREVIEW && window.matchMedia("(min-width: 861px)").matches;
+  const screen = useFrame
+    ? `<iframe src="${esc(d.url)}" title="${esc(d.label)}" loading="lazy"></iframe>`
+    : d.shots.map((s, i) => `<img src="${esc(s)}" alt="" class="${i === 0 ? "on" : ""}" data-i="${i}">`).join("");
+  const rows = BUILDS.map((b, i) => `
+    <a class="row reveal" style="--i:${i + 4}" href="#/builds/${b.slug}">
+      ${thumb(b)}
+      <span class="name">${esc(b.name)}${b.subtitle ? `<small>${esc(b.subtitle)}</small>` : ""}</span>
+      <span class="job">${esc(b.one)}</span>
+      ${lamp(b.status)}
+      <span class="open">Open</span>
+    </a>`).join("");
+  const how = HOW.map(([t, c]) => `<div><dt>${esc(t)}</dt><dd>${esc(c)}</dd></div>`).join("");
+  app.innerHTML = `
+    <section class="hero">
+      <div>
+        <h1 class="reveal" style="--i:0">${esc(SITE.headline)}</h1>
+        <p class="lede reveal" style="--i:1">${esc(SITE.lede)}</p>
+        <div class="cta reveal" style="--i:2">
+          ${PREVIEW ? `<a class="btn" href="${esc(BUILDS.find((x) => x.slug === d.slug).demoPreview)}" target="_blank" rel="noopener">Open a live demo</a>` : `<a class="btn" href="${esc(d.url)}">Open a live demo</a>`}
+          <a class="btn ghost" href="#builds">See all six</a>
+        </div>
+      </div>
+      <div class="reveal" style="--i:2">
+        <div class="device" id="hero-device">
+          ${deviceBar("quietoperator.ai/" + d.url)}
+          <div class="screen">${screen}</div>
+        </div>
+        <div class="cap">
+          <span>${esc(d.label)}${useFrame ? ", click around" : ""}</span>
+          ${useFrame ? "" : `<span class="dots" id="hero-dots">${d.shots.map((_, i) => `<i class="${i === 0 ? "on" : ""}" data-i="${i}" role="button" aria-label="Screenshot ${i + 1}"></i>`).join("")}</span>`}
+          <span>Sample data. Resets on reload.</span>
+        </div>
+      </div>
+    </section>
+    <section class="board" id="builds" aria-label="Builds">
+      <div class="board-head reveal" style="--i:3"><span>Six builds</span><span>Status lamps are honest</span></div>
+      ${rows}
+    </section>
+    <section class="how reveal" style="--i:10">
+      <h2>How these get built</h2>
+      <dl class="pipe">${how}</dl>
+    </section>
+    <section class="about-teaser reveal" style="--i:11">
+      <h2>Who's behind it</h2>
+      <div>
+        <p>Bill Wagner. Self-taught, builds in his free time, and aims every tool at a problem in his own week. Quiet Operator is the name on the workshop door.</p>
+        <p><a href="#/about">More about me and how I work</a></p>
+      </div>
+    </section>`;
+  window.scrollTo(0, 0);
+  if (!useFrame) {
+    const imgs = [...app.querySelectorAll("#hero-device img")];
+    const dots = [...app.querySelectorAll("#hero-dots i")];
+    let cur = 0, timer = null;
+    const show = (i) => { cur = i; imgs.forEach((im, k) => im.classList.toggle("on", k === i)); dots.forEach((dt, k) => dt.classList.toggle("on", k === i)); };
+    const start = () => { stop(); if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show((cur + 1) % imgs.length), 3800); };
+    const stop = () => { if (timer) clearInterval(timer); timer = null; };
+    dots.forEach((dt) => dt.addEventListener("click", () => { show(Number(dt.dataset.i)); start(); }));
+    start(); cleanup.push(stop);
+  }
+}
+
+function renderBuild(slug) {
+  const i = BUILDS.findIndex((b) => b.slug === slug);
+  if (i < 0) return renderNotFound();
+  const b = BUILDS[i];
+  const prev = BUILDS[(i - 1 + BUILDS.length) % BUILDS.length];
+  const next = BUILDS[(i + 1) % BUILDS.length];
+  document.title = `${b.name} — Quiet Operator`;
+
+  const actions = [];
+  if (b.demo && PREVIEW && b.demoPreview) actions.push(`<a class="btn" href="${esc(b.demoPreview)}" target="_blank" rel="noopener">Open the demo</a>`);
+  else if (b.demo && PREVIEW) actions.push(`<span class="btn soon" aria-disabled="true" title="The demo runs once the site is deployed">Demo built, opens on the live site</span>`);
+  else if (b.demo) actions.push(`<a class="btn" href="${esc(b.demo)}">Open the demo</a>`);
+  else actions.push(`<span class="btn soon" aria-disabled="true">Demo in progress</span>`);
+  if (b.live) actions.push(`<a class="btn ghost" href="${esc(b.live)}" target="_blank" rel="noopener">Visit the live site</a>`);
+  const note = b.demo ? `<span class="note">Sample data. Resets when you reload.</span>` : "";
+
+  const heroshot = b.hero
+    ? `<div class="heroshot device reveal" style="--i:2">${deviceBar(b.demo ? "quietoperator.ai/" + b.demo : b.live ? b.live.replace(/^https?:\/\//, "") : b.name)}<div class="screen"><img src="${esc(b.hero)}" alt="${esc(b.name)}" class="on"></div></div>`
+    : "";
+
+  const steps = b.features.map(([t, d, cap, src], k) => `
+    <div class="step${k === 0 ? " on" : ""}" data-k="${k}">
+      <h3>${esc(t)}</h3><p>${esc(d)}</p>
+      <div class="mshot mini">${src ? `<img src="${esc(src)}" alt="${esc(cap)}" loading="lazy">` : `<span>${esc(cap)}</span>`}</div>
+    </div>`).join("");
+  const stageShots = b.features.map(([t, d, cap, src], k) => src
+    ? `<img src="${esc(src)}" alt="${esc(cap)}" class="${k === 0 ? "on" : ""}" data-k="${k}">`
+    : `<div class="tile ${k === 0 ? "on" : ""}" data-k="${k}" style="--tile:${esc(b.tile || "#2DD4BF")};opacity:${k === 0 ? 1 : 0}"><b>${esc(initials(b.name))}</b></div>`).join("");
+
+  app.innerHTML = `
+    <div class="page">
+    <a class="crumb reveal" style="--i:0" href="#/">All builds</a>
+    <header class="bhead reveal" style="--i:1">
+      <div>
+        <h1>${esc(b.name)}${b.subtitle ? `<small>${esc(b.subtitle)}</small>` : ""}</h1>
+        <p class="one">${esc(b.one)}</p>
+        <div class="chips">${b.stack.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div>
+      </div>
+      <div class="meta">
+        ${lamp(b.status)}
+        <div class="actions">${actions.join("")}</div>
+        ${note}
+        <span class="note">Built with ${esc(b.builtWith)}</span>
+      </div>
+    </header>
+    ${heroshot}
+
+    <section class="sec">
+      <h2>Why I built it</h2>
+      <div class="body"><p>${esc(b.why)}</p></div>
+    </section>
+
+    <section class="sec wide">
+      <h2>What it does</h2>
+      <div class="story">
+        <div class="steps" id="steps">${steps}</div>
+        <div class="stage">
+          <div class="device"><div class="bar"><i></i><i></i><i></i><span class="url">${esc(b.name)}</span></div><div class="screen" id="stage-screen">${stageShots}</div></div>
+          <div class="label" id="stage-label">${esc(b.features[0][2])}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>${esc(b.weekLabel || "A week with it")}</h2>
+      <p class="week">${esc(b.week)}</p>
+    </section>
+
+    <section class="sec">
+      <h2>Under the hood</h2>
+      <details>
+        <summary>Stack, process, and what was hard</summary>
+        <div class="inner"><p>${esc(b.hood)}</p></div>
+      </details>
+    </section>
+
+    <nav class="pager" aria-label="Other builds">
+      <a href="#/builds/${prev.slug}"><span>Previous</span>${esc(prev.name)}</a>
+      <a class="next" href="#/builds/${next.slug}"><span>Next</span>${esc(next.name)}</a>
+    </nav>
+    </div>`;
+  window.scrollTo(0, 0);
+
+  // scroll story: the step nearest the middle of the viewport drives the sticky frame
+  const stepEls = [...app.querySelectorAll("#steps .step")];
+  const shots = [...app.querySelectorAll("#stage-screen > *")];
+  const label = app.querySelector("#stage-label");
+  const activate = (k) => {
+    stepEls.forEach((s) => s.classList.toggle("on", Number(s.dataset.k) === k));
+    shots.forEach((s) => { const on = Number(s.dataset.k) === k; s.classList.toggle("on", on); if (s.classList.contains("tile")) s.style.opacity = on ? 1 : 0; });
+    label.textContent = b.features[k][2];
+  };
+  const onScroll = () => {
+    const mid = window.innerHeight * 0.45;
+    let best = 0, bestD = Infinity;
+    stepEls.forEach((s) => { const r = s.getBoundingClientRect(); const c = r.top + r.height / 2; const dd = Math.abs(c - mid); if (dd < bestD) { bestD = dd; best = Number(s.dataset.k); } });
+    activate(best);
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  stepEls.forEach((s) => s.addEventListener("click", () => activate(Number(s.dataset.k))));
+  cleanup.push(() => window.removeEventListener("scroll", onScroll));
+}
+
+function renderAbout() {
+  document.title = "About — Quiet Operator";
+  app.innerHTML = `
+    <section class="about page">
+      <h1 class="reveal" style="--i:0">About</h1>
+      <div class="body reveal" style="--i:1">
+        <p>I'm Bill Wagner. I build software in my free time, in Atlanta, and I'm not a professional developer.</p>
+        <p>Everything on this site started as a small, specific annoyance: a grocery list that forgot what I always buy, a week that never got planned, a decision I kept making on a hunch instead of a number. Instead of hunting for an app, I describe the problem to an AI, argue with it about the smallest version worth building, and ship that. Then I use it every day until it's obviously right or obviously wrong. Either way I learn something, and either way my week gets a little better.</p>
+        <p>Self-taught, in the honest sense: no bootcamp, no degree in this, just years of reading, breaking things, and learning to ask better questions. The tools have changed what self-taught can mean. What used to take a team now takes a clear head and a patient conversation.</p>
+        <p>None of these are products. They're tools I rely on, which is the only test I care about. If one of them turns out to be useful to you, that's a bonus.</p>
+        <div class="tools">
+          <h3>How I work</h3>
+          <p>Claude for thinking, writing, and prompts. Replit Agent for apps. Plain HTML for websites, iterated as numbered mockups. Static hosting for all of it. No hand-written code, and no feature that didn't start as a conversation about what problem it solves.</p>
+          <h3>Get in touch</h3>
+          <p><span class="placeholder">Contact link goes here</span></p>
+        </div>
+      </div>
+    </section>`;
+  window.scrollTo(0, 0);
+}
+
+function renderNotFound() {
+  document.title = "Not found — Quiet Operator";
+  app.innerHTML = `<div class="page"><h1>Nothing here.</h1><p style="margin-top:1rem"><a href="#/">Back to the builds</a></p></div>`;
+}
+
+function route() {
+  cleanup.forEach((fn) => fn()); cleanup = [];
+  const hash = location.hash.replace(/^#/, "") || "/";
+  if (hash === "builds") { const el = document.getElementById("builds"); if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); return; } }
+  const parts = hash.split("/").filter(Boolean);
+  let nav = "home";
+  if (parts.length === 0) renderHome();
+  else if (parts[0] === "builds" && parts[1]) renderBuild(parts[1]);
+  else if (parts[0] === "about") { renderAbout(); nav = "about"; }
+  else renderNotFound();
+  document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === nav));
+}
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
