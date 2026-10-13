@@ -151,16 +151,22 @@
     .row .open { display: none; }
   }
 
-  /* ---------- home: pipeline ---------- */
+  /* ---------- home: how I build ---------- */
   .how { margin-top: 4.5rem; }
-  .how h2 { max-width: 14ch; margin-bottom: 1.6rem; }
-  .pipe { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; counter-reset: step; }
-  .pipe::before { content: ""; position: absolute; left: 10px; right: 10px; top: 10px; height: 1px; background: var(--line-strong); }
-  .pipe > div { position: relative; padding-top: 1.6rem; }
-  .pipe > div::before { content: ""; position: absolute; left: 0; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink); }
-  .pipe dt { font-weight: 600; font-size: 1.02rem; margin-bottom: .3rem; }
-  .pipe dd { margin: 0; color: var(--muted); font-size: .95rem; max-width: 32ch; }
-  @media (max-width: 760px) { .pipe { grid-template-columns: 1fr; gap: 1.1rem; } .pipe::before { left: 5px; right: auto; top: 10px; bottom: 10px; width: 1px; height: auto; } .pipe > div { padding-top: 0; padding-left: 1.6rem; } .pipe > div::before { top: 6px; } }
+  .how-head { display: grid; grid-template-columns: 1fr 2fr; gap: .8rem 3rem; align-items: start; margin-bottom: 1.8rem; }
+  .how-head h2 { max-width: 12ch; }
+  .how-head p { color: var(--muted); font-size: 1.05rem; max-width: 56ch; }
+  .toolbox { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 2rem; margin: 0; border-top: 1px solid var(--line-strong); }
+  .tool { padding: 1.1rem 0 1.3rem; border-bottom: 1px solid var(--line); }
+  .tool dt { font-family: var(--display); font-weight: 600; font-size: 1.12rem; letter-spacing: -0.01em; margin-bottom: .35rem; }
+  .tool dd { margin: 0; color: var(--muted); font-size: .95rem; max-width: 36ch; }
+  .rules { display: grid; grid-template-columns: 1fr 2fr; gap: .8rem 3rem; margin-top: 2.4rem; }
+  .rules h3 { font-size: 1.15rem; }
+  .rules ul { margin: 0; padding: 0; list-style: none; display: grid; gap: .9rem; }
+  .rules li { color: var(--muted); max-width: 64ch; padding-left: 1rem; border-left: 2px solid var(--line-strong); }
+  .rules li b { color: var(--ink); font-weight: 600; }
+  @media (max-width: 900px) { .toolbox { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 760px) { .how-head, .rules { grid-template-columns: 1fr; } .toolbox { grid-template-columns: 1fr; } }
 
   .about-teaser { margin-top: 4.5rem; padding-top: 2rem; border-top: 1px solid var(--line-strong); display: grid; grid-template-columns: 1fr 2fr; gap: 1rem 3rem; }
   @media (max-width: 760px) { .about-teaser { grid-template-columns: 1fr; } }
@@ -220,6 +226,30 @@
   .pager a span { display: block; font-weight: 400; color: var(--muted); font-size: .85rem; }
   .pager .next { text-align: right; }
 
+  /* ---------- desktop / phone ---------- */
+  .view-row { display: flex; justify-content: flex-end; align-items: center; gap: .8rem; margin: 0 0 .9rem; color: var(--muted); font-size: .85rem; }
+  .viewtoggle { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; padding: 3px; gap: 2px; background: var(--surface); }
+  .viewtoggle button { font: 600 .85rem/1 var(--body); color: var(--muted); background: transparent; border: 0; border-radius: 6px; padding: .45rem .85rem; cursor: pointer; }
+  .viewtoggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .mode-phone .for-desktop, .mode-desktop .for-phone { display: none; }
+  .phone { position: relative; width: min(300px, 78%); margin: 0 auto; aspect-ratio: 412 / 892; border-radius: 44px; background: #0A0D0F; padding: 30px 11px 18px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); border: 1px solid #2A3236; }
+  .phone::before { content: ""; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 64px; height: 6px; border-radius: 6px; background: #20272B; }
+  .phone .scr { position: relative; width: 100%; height: 100%; border-radius: 26px; overflow: hidden; background: #0D1220; }
+  .phone .scr img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; opacity: 0; transition: opacity .6s ease; }
+  .phone .scr img.on { opacity: 1; }
+  .phone .scr .tile { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity .6s; }
+  .phone .scr .tile b { font-family: var(--display); font-size: 2.6rem; font-weight: 700; color: var(--tile, #2DD4BF); }
+  .heroshot .phone { width: min(320px, 82%); }
+  .stage .phone { width: min(320px, 86%); }
+  .mshot .phone { width: min(250px, 72%); }
+  .phone-modal { position: fixed; inset: 0; z-index: 60; background: rgba(8,10,12,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: grid; place-items: center; padding: 16px; }
+  .pm-inner { display: grid; justify-items: center; gap: 14px; }
+  .pm-size { position: relative; }
+  .phone.live { position: absolute; top: 0; left: 0; width: 412px; height: 892px; aspect-ratio: auto; transform-origin: 0 0; }
+  .phone.live .scr iframe { width: 390px; height: 844px; border: 0; display: block; background: #0D1220; }
+  .pm-bar { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; justify-content: center; color: #C7CEC9; font-size: .88rem; }
+  .pm-bar .btn.ghost { color: #E8EAE6; border-color: #4A5358; }
+
   /* ---------- about ---------- */
   .about { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem 3rem; }
   .about .body { font-size: 1.08rem; }
@@ -259,16 +289,24 @@
    ===================================================================== */
 const SITE = {
   headline: "Small software, built to be used every day.",
-  lede: "I'm Bill. I design and ship personal tools and websites with AI, then run them on myself. Everything here is real and running. Open any of them and try it with sample data.",
+  lede: "I'm Bill. I design and build small tools and websites in my free time, then use them every day. Everything here is real and running. Open any of them and try it with sample data.",
   heroDemo: { slug: "chief-of-stuff", url: "demo/chief-of-stuff/", label: "Live demo · Chief of Stuff",
     shots: ["img/chief-of-stuff/dashboard.jpg", "img/chief-of-stuff/week.jpg", "img/chief-of-stuff/meals-week.jpg", "img/chief-of-stuff/shopping.jpg"] },
 };
 
-const HOW = [
-  ["Think with Claude", "Every build starts as a conversation: what problem, what the smallest useful version is, what to leave out. Claude also drafts the build prompts and most of the words on this site."],
-  ["Build in Replit", "Apps are built by prompting Replit Agent one feature at a time, with a screenshot review after every pass. No hand-written code."],
-  ["Sites by hand", "Websites are single HTML files, iterated as numbered mockups until they're right, then hosted as plain static pages."],
-  ["Ship small, keep using", "Nothing here is a concept. The status lamp next to each build is honest: if something is paused or handed off, it says so."],
+const TOOLBOX = [
+  ["Claude", "Planning and judgment calls. Every build starts here as a written brief: the problem, the smallest useful version, the data it needs, and what to leave out."],
+  ["Replit", "Full-stack web apps: React front ends, Express APIs, Postgres, real sign-in. Most of the tools on this site run there and install to my phone's home screen."],
+  ["Claude Code", "Hands-on work inside a repository, when a change spans many files or I want to review every diff before it lands."],
+  ["OpenClaw", "An always-on assistant on a small home server. It runs scheduled jobs and feeds calendar, news, and reading lists into the other tools through their APIs."],
+  ["GitHub, Cloudflare, Supabase, Vercel, Resend", "Hosting, DNS, data, and email, chosen per project rather than out of habit."],
+  ["Plain HTML", "Websites. One file, no framework, nothing to maintain, iterated as complete clickable mockups until it's right."],
+];
+const PRINCIPLES = [
+  ["Brief before build", "Every change goes in as a scoped brief: what to change, what to leave alone, and what done looks like. \"Fix these six things, add nothing\" is a real instruction I give."],
+  ["I own the decisions", "AI writes most of the code. I decide the data model, what's stored where, what stays private, and what gets cut."],
+  ["Private by default", "Personal data lives in single-user apps behind real sign-in, keys stay on the server, and the demos here run on invented data."],
+  ["Use it, then judge it", "Nothing here is a concept. The status lamp next to each build is honest: if something is paused or handed off, it says so."],
 ];
 
 const BUILDS = [
@@ -276,93 +314,93 @@ const BUILDS = [
     slug: "chief-of-stuff", name: "Chief of Stuff", status: "live", tile: "#2DD4BF",
     one: "Tasks, shopping, meals, and workouts on one dense screen.",
     stack: ["React + Vite", "Express", "Replit", "Postgres", "Installed PWA"],
-    builtWith: "Replit Agent and Claude",
+    builtWith: "Replit, from briefs written in Claude",
     demo: "demo/chief-of-stuff/", demoPreview: "https://claude.ai/artifact/Key4ocAfdXskRye5et5ehi", live: null,
-    hero: "img/chief-of-stuff/dashboard.jpg",
+    hero: "img/chief-of-stuff/dashboard.jpg", heroPhone: "img/chief-of-stuff/m-dashboard.jpg",
     why: "I had tasks in one app, groceries in another, meal plans in a notes file, and a workout schedule in my head. None of them talked to each other, and all of them wanted to look nice instead of fitting on one screen. Chief of Stuff is the opposite: one compact, dark board that holds the whole week, built for a phone in a grocery aisle as much as for a desk.",
     features: [
-      ["Board, Week, Today", "Every task lives on a kanban with four statuses and five fixed lanes: Cleaning, Home, Household Projects, Admin, and Follow-ups. Schedule a task onto a day and it appears in the Week and Today views; priority is a thin colored stripe, not a badge.", "Week view with scheduled tasks", "img/chief-of-stuff/week.jpg"],
-      ["Shopping that remembers", "Provisions is a standing list per store. Checking an item off parks it in a library for one-tap reactivation instead of deleting it. Buy List and Considering hold everything else, and Shop mode is the big-tap in-store view.", "Shopping and Shop mode on a phone", "img/chief-of-stuff/mobile-shop-mode.jpg"],
-      ["Meals", "A recipe library, a seven-day grid where a slot can hold a main and sides, Sunday batch-prep sequencing, rough macros per day, and a shopping list that sends straight into Buy List.", "Next week's meal grid", "img/chief-of-stuff/meals-week.jpg"],
-      ["Workouts on the week", "Workout templates sit in a collapsible row inside the Week view. Drag one onto a day and the change pushes to the calendar.", "Workouts row in Week view", "img/chief-of-stuff/workouts.jpg"],
-      ["Dashboard", "The landing screen: today's tasks, tonight's meal, calendar, news briefs, and learning items, fed by an always-on assistant through the API.", "Dashboard", "img/chief-of-stuff/dashboard.jpg"],
-      ["Works offline, lives on the home screen", "Installed as a PWA. Snapshots and a mutation queue mean it keeps working in a store with no signal and syncs when it's back.", "Dashboard and Today on an iPhone", "img/chief-of-stuff/mobile-today.jpg"],
+      ["Board, Week, Today", "Every task lives on a kanban with four statuses and five fixed lanes: Cleaning, Home, Household Projects, Admin, and Follow-ups. Schedule a task onto a day and it appears in the Week and Today views; priority is a thin colored stripe, not a badge.", "Week view with scheduled tasks", "img/chief-of-stuff/week.jpg", "img/chief-of-stuff/m-board.jpg"],
+      ["Shopping that remembers", "Provisions is a standing list per store. Checking an item off parks it in a library for one-tap reactivation instead of deleting it. Buy List and Considering hold everything else, and Shop mode is the big-tap in-store view.", "Shopping and Shop mode", "img/chief-of-stuff/shopping.jpg", "img/chief-of-stuff/m-shopmode.jpg"],
+      ["Meals", "A recipe library, a seven-day grid where a slot can hold a main and sides, Sunday batch-prep sequencing, rough macros per day, and a shopping list that sends straight into Buy List.", "Next week's meal grid", "img/chief-of-stuff/meals-week.jpg", "img/chief-of-stuff/m-meals.jpg"],
+      ["Workouts on the week", "Workout templates sit in a collapsible row inside the Week view. Drag one onto a day and the change pushes to the calendar.", "Workouts row in Week view", "img/chief-of-stuff/workouts.jpg", "img/chief-of-stuff/m-week.jpg"],
+      ["Dashboard", "The landing screen: today's tasks, tonight's meal, calendar, news briefs, and learning items, fed by an always-on assistant through the API.", "Dashboard", "img/chief-of-stuff/dashboard.jpg", "img/chief-of-stuff/m-dashboard.jpg"],
+      ["Works offline, lives on the home screen", "Installed as a PWA. Snapshots and a mutation queue mean it keeps working in a store with no signal and syncs when it's back.", "Installed on a phone", "img/chief-of-stuff/mobile-today.jpg", "img/chief-of-stuff/m-today.jpg"],
     ],
     week: "Sunday night I fill the meal grid and send the list to Buy List. Monday morning the Dashboard shows what's due, what's for dinner, and what the assistant pulled from my calendar. Through the week I work from Today, drag the odd task to another day, and check off groceries in Shop mode. Saturday I clear the board.",
-    hood: "A pnpm workspace with a React and Vite frontend, an Express API, Replit key-value storage for tasks and shopping, and Postgres for meals. The browser never holds an API key; the always-on assistant that feeds the Dashboard uses a server-side key instead. Nearly every line was produced by prompting Replit Agent, with Claude used to think through each feature and write the prompt first. The demo on this site is the real production build with its API calls answered from sample data in the browser.",
+    hood: "A pnpm workspace with a React and Vite frontend, an Express API, Replit key-value storage for tasks and shopping, and Postgres for meals. The browser never holds an API key; the always-on assistant that feeds the Dashboard uses a server-side key instead. The API is defined once as a typed contract that generates the client code and the validation, and the app keeps working offline with a queue that syncs when the connection is back. Built in Replit from scoped briefs written in Claude. The demo on this site is the real production build with its API calls answered from sample data in the browser.",
   },
   {
     slug: "calibrate", name: "Calibrate", status: "live", tile: "#E0A52E",
     one: "A daily prediction journal that scores how well you think.",
-    stack: ["Replit", "Installed PWA"], builtWith: "Replit Agent and Claude", demo: "demo/calibrate/", demoPreview: "https://claude.ai/artifact/Hg8SxWRX22yjt3MsbJjXZ1", live: null, hero: "img/calibrate/hero.jpg",
+    stack: ["Replit", "Installed PWA"], builtWith: "Replit, from briefs written in Claude", demo: "demo/calibrate/", demoPreview: "https://claude.ai/artifact/Hg8SxWRX22yjt3MsbJjXZ1", live: null, hero: "img/calibrate/hero.jpg", heroPhone: "img/calibrate/m-hero.jpg", primary: "phone",
     why: "I wanted to get better at thinking, not just at knowing things. The only honest way to measure that is to write predictions down with a confidence number, score them when they resolve, and look at the pattern over months. Calibrate turns that into a two-minute daily habit.",
     features: [
-      ["Log a prediction", "Write the call, attach a confidence percentage, and set when it resolves. A client meeting, a decision, a deadline, a hunch.", "New prediction entry", "img/calibrate/log.jpg"],
-      ["Score it later", "When a prediction resolves, mark it right or wrong. Calibrate keeps the ledger so you don't have to remember.", "Resolving a prediction", "img/calibrate/score.jpg"],
-      ["See your calibration", "Over time the chart shows whether your 80% calls land about 80% of the time, or whether you run hot or cautious.", "Calibration chart", "img/calibrate/stats.jpg"],
-      ["Frameworks in your pocket", "A short kit of thinking frameworks for structuring a problem before you commit to an answer.", "Frameworks list", "img/calibrate/playbook.jpg"],
+      ["Log a prediction", "Write the call, attach a confidence percentage, and set when it resolves. A client meeting, a decision, a deadline, a hunch.", "New prediction entry", "img/calibrate/log.jpg", "img/calibrate/m-log.jpg"],
+      ["Score it later", "When a prediction resolves, mark it right or wrong. Calibrate keeps the ledger so you don't have to remember.", "Resolving a prediction", "img/calibrate/score.jpg", "img/calibrate/m-score.jpg"],
+      ["See your calibration", "Over time the chart shows whether your 80% calls land about 80% of the time, or whether you run hot or cautious.", "Calibration chart", "img/calibrate/stats.jpg", "img/calibrate/m-stats.jpg"],
+      ["Frameworks in your pocket", "A short kit of thinking frameworks for structuring a problem before you commit to an answer.", "Frameworks list", "img/calibrate/playbook.jpg", "img/calibrate/m-playbook.jpg"],
     ],
     week: "Each morning I log one or two predictions about the day. Evenings I resolve whatever closed. On Sunday I look at the calibration chart and notice which kinds of calls I keep getting wrong.",
-    hood: "A single-user web app built in Replit and installed to the iPhone home screen from Safari. It's the measurement half of a 12-week plan to improve how I assess problems and respond in conversation; the frameworks live alongside the journal so the two reinforce each other.",
+    hood: "A single-user web app built in Replit and installed to the iPhone home screen from Safari. The PIN is stored only as a salted hash, the server computes the Brier scores and calibration buckets, and the app has its own browser tests for navigation, since it runs without browser controls. It's the measurement half of a 12-week plan to improve how I assess problems and respond in conversation; the frameworks live alongside the journal so the two reinforce each other.",
   },
   {
     slug: "orbit", name: "Orbit", status: "live", tile: "#9B8CF5",
     one: "Scores your friendships by what they give you, and shows where the gaps are.",
-    stack: ["Replit", "Hosted with login"], builtWith: "Replit Agent and Claude", demo: "demo/orbit/", demoPreview: "https://claude.ai/artifact/Jr34dbVL7TZVdYctjFjzz7", live: null, hero: "img/orbit/hero.jpg",
+    stack: ["Replit", "Hosted with login"], builtWith: "Replit, from briefs written in Claude", demo: "demo/orbit/", demoPreview: "https://claude.ai/artifact/Jr34dbVL7TZVdYctjFjzz7", live: null, hero: "img/orbit/hero.jpg", heroPhone: "img/orbit/m-hero.jpg",
     why: "Most people grade friendships by closeness. I wanted to grade them by what they actually cover: who's there for fun, who's there when things are hard, who pushes me to grow. Scoring by category makes it obvious where life is well covered and where it's thin, which is a much more useful thing to know than who I text most.",
     features: [
-      ["Score each friend across eight categories", "Fun and play, adventure, emotional support, being known, growth, everyday companionship, practical reliability, and one more lens: how at ease you are around them without drinking. Each friend gets a 0 to 3 score in each.", "Scoring a friend", "img/orbit/score.jpg"],
-      ["See the gaps", "Totals by category, not by person. It's the difference between \"I have good friends\" and \"nobody in my life covers adventure right now.\"", "Category totals", "img/orbit/gaps.jpg"],
-      ["Log touchpoints", "After time with a friend, note three things: did you look forward to it, did you feel like yourself, did you leave with more energy. Patterns show up fast.", "Touchpoint journal", "img/orbit/touchpoints.jpg"],
-      ["Synced between phone and desktop", "Hosted with a login so entries made on the phone after dinner show up on the laptop on Sunday.", "Snapshots saved to your account", "img/orbit/snapshots.jpg"],
+      ["Score each friend across eight categories", "Fun and play, adventure, emotional support, being known, growth, everyday companionship, practical reliability, and one more lens: how at ease you are around them without drinking. Each friend gets a 0 to 3 score in each.", "Scoring a friend", "img/orbit/score.jpg", "img/orbit/m-score.jpg"],
+      ["See the gaps", "Totals by category, not by person. It's the difference between \"I have good friends\" and \"nobody in my life covers adventure right now.\"", "Category totals", "img/orbit/gaps.jpg", "img/orbit/m-gaps.jpg"],
+      ["Log touchpoints", "After time with a friend, note three things: did you look forward to it, did you feel like yourself, did you leave with more energy. Patterns show up fast.", "Touchpoint journal", "img/orbit/touchpoints.jpg", "img/orbit/m-touchpoints.jpg"],
+      ["Synced between phone and desktop", "Hosted with a login so entries made on the phone after dinner show up on the laptop on Sunday.", "Snapshots saved to your account", "img/orbit/snapshots.jpg", "img/orbit/m-snapshots.jpg"],
     ],
     week: "After a dinner I log the touchpoint in thirty seconds. Once a month I look at the category totals and notice, say, that adventure is covered by one person and growth by no one. That tells me who to call, and who I've been meaning to meet.",
-    hood: "Built in Replit with Claude, hosted with a login so data persists across devices. The scoring framework came first, as a document; the app came second, once the framework proved useful on paper.",
+    hood: "Built in Replit with Claude, hosted with a login so data persists across devices. Edits queue on the device first, sync to the server, and get flagged instead of overwritten if a newer version exists. The scoring framework came first, as a document; the app came second, once the framework proved useful on paper.",
   },
   {
     slug: "keel", name: "Keel", status: "live", tile: "#5CA8D9",
     one: "A sobriety tracker that keeps a steady count without the lectures.",
-    stack: ["Replit", "Installed PWA", "Standalone and private"], builtWith: "Replit Agent and Claude", demo: "demo/keel/", demoPreview: "https://claude.ai/artifact/1GB9YhA9tpAE6TmC5Phqjr", live: null, hero: "img/keel/hero.jpg",
+    stack: ["Replit", "Installed PWA", "Standalone and private"], builtWith: "Replit, from briefs written in Claude", demo: "demo/keel/", demoPreview: "https://claude.ai/artifact/1GB9YhA9tpAE6TmC5Phqjr", live: null, hero: "img/keel/hero.jpg", heroPhone: "img/keel/m-hero.jpg", primary: "phone",
     why: "A keel steadies a boat without steering it. Most sobriety apps are either a bare day counter or a social feed. Keel is a quiet dashboard: honest numbers, milestones grounded in established research, and no lecture when a day resets. It's built for someone who likes a tool and some data to see what they've done and what's next.",
     features: [
-      ["Current run and all-time total", "A slip resets the day count but never erases the cumulative stats. Both numbers are always visible, because both are true.", "Home dashboard", "img/keel/run.jpg"],
-      ["What's been accomplished, what's next", "Milestones based on established research into recovery timelines, so the next marker always has a reason behind it.", "Milestones", "img/keel/milestones.jpg"],
-      ["Standalone by design", "No integrations with anything else. Keel doesn't talk to the task manager, the calendar, or an assistant. It's a separate, private place.", "Settings", "img/keel/standalone.jpg"],
-      ["Ten-second check-in", "Lives on the home screen. Open it, log the day, close it.", "Daily check-in", "img/keel/checkin.jpg"],
+      ["Current run and all-time total", "A slip resets the day count but never erases the cumulative stats. Both numbers are always visible, because both are true.", "Home dashboard", "img/keel/run.jpg", "img/keel/m-run.jpg"],
+      ["What's been accomplished, what's next", "Milestones based on established research into recovery timelines, so the next marker always has a reason behind it.", "Milestones", "img/keel/milestones.jpg", "img/keel/m-milestones.jpg"],
+      ["Standalone by design", "No integrations with anything else. Keel doesn't talk to the task manager, the calendar, or an assistant. It's a separate, private place.", "Settings", "img/keel/standalone.jpg", "img/keel/m-standalone.jpg"],
+      ["Ten-second check-in", "Lives on the home screen. Open it, log the day, close it.", "Daily check-in", "img/keel/checkin.jpg", "img/keel/m-checkin.jpg"],
     ],
     week: "The morning check-in takes ten seconds. The dashboard shows the current run, the all-time total, and the next milestone. On a hard day it's a place to look at the numbers instead of arguing with them.",
-    hood: "A single-user web app built in Replit, installed as a PWA. The design decisions were made deliberately: a slip resets the streak but keeps cumulative statistics, and the app is intentionally not connected to any other tool in this collection. The demo uses invented sample data throughout.",
+    hood: "A single-user web app built in Replit, installed as a PWA. It has no analytics or outside scripts, a rate-limited PIN on top of sign-in, and an export that never includes security data. The design decisions were made deliberately: a slip resets the streak but keeps cumulative statistics, and the app is intentionally not connected to any other tool in this collection. The demo uses invented sample data throughout.",
   },
   {
     slug: "lions", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
     one: "A modern site for a 40-member service club, with a 24-day fundraiser built in.",
-    stack: ["Static HTML", "Single page", "Custom domain"], builtWith: "Claude, iterated as mockups", demo: null, live: "https://nephillylions.org", hero: null,
+    stack: ["Static HTML", "Single page", "Custom domain"], builtWith: "Claude, iterated as mockups", demo: null, live: "https://nephillylions.org", hero: "img/lions/hero.jpg", heroPhone: "img/lions/m-about.jpg",
     why: "The club's site was a 2000s-era template: nested tables, bold text everywhere, nothing that worked on a phone. A family member asked for help. The redesign gives the club a real front door, and the advent-calendar section turns a paper raffle into something members and buyers can follow online in December.",
     features: [
-      ["Everything a visitor needs on one page", "Who the club is, when and where it meets, the causes it supports, upcoming events, photos, and how to join. Guests are told to just show up.", "Home and meeting details"],
-      ["Advent calendar fundraiser", "A 24-door grid that reveals one winning number a day from December 1 to 24, a how-it-works explainer, and a prizes-and-donors list.", "The 24-door grid"],
-      ["Rules written in", "Calendars are sold in person for cash, check, or money order, with no online sales, because that's what the state's raffle rules allow. The site says so plainly.", "How it works"],
-      ["Built for phones first", "Most visitors arrive from a Facebook post. The layout, type, and tap targets start from that.", "Mobile layout"],
+      ["Everything a visitor needs on one page", "Who the club is, when and where it meets, the causes it supports, upcoming events, photos, and how to join. Guests are told to just show up.", "Home and meeting details", "img/lions/about.jpg", "img/lions/m-about.jpg"],
+      ["Advent calendar fundraiser", "A 24-door grid that reveals one winning number a day from December 1 to 24, a how-it-works explainer, and a prizes-and-donors list.", "The 24-door grid", "img/lions/advent.jpg", "img/lions/m-advent.jpg"],
+      ["Rules written in", "Calendars are sold in person for cash, check, or money order, with no online sales, because that's what the state's raffle rules allow. The site says so plainly.", "How it works", "img/lions/rules.jpg", "img/lions/m-rules.jpg"],
+      ["Built for phones first", "Most visitors arrive from a Facebook post. The layout, type, and tap targets start from that.", "Mobile layout", "img/lions/mobile.jpg", "img/lions/m-causes.jpg"],
     ],
     weekLabel: "How it gets used",
     week: "Members send prospective members to the site instead of a Facebook page. In December the club reveals one winner a day on the calendar grid, and buyers check their number from their phones.",
     hood: "One static HTML file with its own CSS and a little JavaScript for the calendar grid and filters. No framework, no build step, nothing to maintain. Designed as a series of numbered mockups reviewed with the club before it went live.",
   },
   {
-    slug: "arc", name: "ARC", status: "client", tile: "#C9705A",
-    one: "Marketing site for an executive-mentorship practice, from first mockup to handoff.",
-    stack: ["Static HTML", "Nine views, one file", "Embedded images"], builtWith: "Claude, nine mockup rounds", demo: null, live: null, hero: null,
-    why: "ARC pairs students, from middle school through college, with global executives as one-on-one mentors. The founder needed a site that explained a premium, high-touch service to parents without sounding like every other college counselor. We worked through nine complete, clickable mockups until the structure and the voice were right.",
+    slug: "arc", name: "ARC", status: "mockup", tile: "#C9705A",
+    one: "A marketing-site concept for an executive-mentorship practice, taken through nine complete mockups.",
+    stack: ["Static HTML", "Nine views, one file", "Embedded images"], builtWith: "Claude, nine mockup rounds", demo: null, live: null, hero: "img/arc/hero.jpg", heroPhone: "img/arc/m-home.jpg",
+    why: "ARC pairs students, from middle school through college, with global executives as one-on-one mentors. The design problem was explaining a premium, high-touch service to parents without sounding like every other college counselor. I worked through nine complete, clickable mockups until the structure and the voice were right.",
     features: [
-      ["A whole site in one file", "Home, who it's for, method, stories, mentors, getting started, insights, and the legal pages, all as views inside a single HTML file so each round could be reviewed as a working site rather than a picture.", "Home view"],
-      ["The ARC framework, explorable", "The four-phase method, Discover, Strategize, Roadmap, Mentor and execute, laid out so a parent can click through what happens in each phase.", "Framework explorer"],
-      ["Built around the student's stage", "Middle school, high school, college, and international students each get their own panel, because the pitch is different for each.", "Stage tabs"],
-      ["A scorecard, not a sales pitch", "A side-by-side of what a standard counselor does and what ARC does, with a plain verdict at the bottom.", "Scorecard"],
-      ["One way in", "A discovery-session form that asks for the child's story first, with the questions parents actually get asked.", "Discovery form"],
+      ["A whole site in one file", "Home, who it's for, method, stories, mentors, getting started, insights, and the legal pages, all as views inside a single HTML file so each round could be reviewed as a working site rather than a picture.", "Home view", "img/arc/home.jpg", "img/arc/m-home.jpg"],
+      ["The ARC framework, explorable", "The four-phase method, Discover, Strategize, Roadmap, Mentor and execute, laid out so a parent can click through what happens in each phase.", "Framework explorer", "img/arc/framework.jpg", "img/arc/m-framework.jpg"],
+      ["Built around the student's stage", "Middle school, high school, college, and international students each get their own panel, because the pitch is different for each.", "Stage tabs", "img/arc/stages.jpg", "img/arc/m-stages.jpg"],
+      ["A scorecard, not a sales pitch", "A side-by-side of what a standard counselor does and what ARC does, with a plain verdict at the bottom.", "Scorecard", "img/arc/scorecard.jpg", "img/arc/m-scorecard.jpg"],
+      ["One way in", "A discovery-session form that asks for the child's story first, with the questions parents actually get asked.", "Discovery form", "img/arc/start.jpg", "img/arc/m-start.jpg"],
     ],
-    weekLabel: "How it gets used",
-    week: "Parents land from a referral, read the method, open the stage that matches their kid, and book a discovery session.",
-    hood: "A single self-contained HTML file with no framework and all images embedded, so it can be hosted anywhere. Typography is a serif for the editorial voice paired with a geometric sans for structure. Every mockup round shipped as a complete file, which made review a matter of opening it rather than imagining it. The showcase copy has the inquiry form disabled.",
+    weekLabel: "How it's meant to be used",
+    week: "A parent arrives from a referral, reads the method, opens the stage that matches their child, and books a discovery session.",
+    hood: "A single self-contained HTML file with no framework and all images embedded, so it can be hosted anywhere. Typography is a serif for the editorial voice paired with a geometric sans for structure. Every mockup round shipped as a complete file, which made review a matter of opening it rather than imagining it. Photos and names are replaced with placeholders in these screenshots.",
   },
 ];
 
@@ -370,7 +408,7 @@ const BUILDS = [
 
 const app = document.getElementById("app");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const STATUS = { live: ["", "Live"], client: ["client", "Client build"], paused: ["paused", "Paused"] };
+const STATUS = { live: ["", "Live"], mockup: ["client", "Mockup"], paused: ["paused", "Paused"] };
 const PREVIEW = !!window.__PREVIEW__;
 const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 let cleanup = [];
@@ -397,7 +435,8 @@ function renderHome() {
       ${lamp(b.status)}
       <span class="open">Open</span>
     </a>`).join("");
-  const how = HOW.map(([t, c]) => `<div><dt>${esc(t)}</dt><dd>${esc(c)}</dd></div>`).join("");
+  const tools = TOOLBOX.map(([t, c]) => `<div class="tool"><dt>${esc(t)}</dt><dd>${esc(c)}</dd></div>`).join("");
+  const rules = PRINCIPLES.map(([t, c]) => `<li><b>${esc(t)}.</b> ${esc(c)}</li>`).join("");
   app.innerHTML = `
     <section class="hero">
       <div>
@@ -421,12 +460,16 @@ function renderHome() {
       </div>
     </section>
     <section class="board" id="builds" aria-label="Builds">
-      <div class="board-head reveal" style="--i:3"><span>Six builds</span><span>Status lamps are honest</span></div>
+      <div class="board-head reveal" style="--i:3"><span>Six builds</span><span>Live, mockup, or paused, the lamp says which</span></div>
       ${rows}
     </section>
     <section class="how reveal" style="--i:10">
-      <h2>How these get built</h2>
-      <dl class="pipe">${how}</dl>
+      <div class="how-head">
+        <h2>How I build</h2>
+        <p>Different problems get different tools. What stays the same is the order of work: decide what the thing is for, write it down, then build the smallest version that does that job.</p>
+      </div>
+      <dl class="toolbox">${tools}</dl>
+      <div class="rules"><h3>Rules I build by</h3><ul>${rules}</ul></div>
     </section>
     <section class="about-teaser reveal" style="--i:11">
       <h2>Who's behind it</h2>
@@ -455,36 +498,46 @@ function renderBuild(slug) {
   const prev = BUILDS[(i - 1 + BUILDS.length) % BUILDS.length];
   const next = BUILDS[(i + 1) % BUILDS.length];
   document.title = `${b.name} — Quiet Operator`;
+  const hasPhone = !!b.heroPhone || b.features.some((f) => f[4]);
+  const startMode = hasPhone && b.primary === "phone" ? "phone" : "desktop";
 
   const actions = [];
   if (b.demo && PREVIEW && b.demoPreview) actions.push(`<a class="btn" href="${esc(b.demoPreview)}" target="_blank" rel="noopener">Open the demo</a>`);
-  else if (b.demo && PREVIEW) actions.push(`<span class="btn soon" aria-disabled="true" title="The demo runs once the site is deployed">Demo built, opens on the live site</span>`);
+  else if (b.demo && PREVIEW) actions.push(`<span class="btn soon" aria-disabled="true">Demo built, opens on the live site</span>`);
   else if (b.demo) actions.push(`<a class="btn" href="${esc(b.demo)}">Open the demo</a>`);
   else actions.push(`<span class="btn soon" aria-disabled="true">Demo in progress</span>`);
+  if (b.demo && !PREVIEW) actions.push(`<button class="btn ghost" type="button" id="phone-demo">Try it at phone size</button>`);
   if (b.live) actions.push(`<a class="btn ghost" href="${esc(b.live)}" target="_blank" rel="noopener">Visit the live site</a>`);
   const note = b.demo ? `<span class="note">Sample data. Resets when you reload.</span>` : "";
+  const url = b.demo ? "quietoperator.ai/" + b.demo : b.live ? b.live.replace(/^https?:\/\//, "") : b.name;
+  const tileFor = (k, on) => `<div class="tile${on ? " on" : ""}" data-k="${k}" style="--tile:${esc(b.tile || "#2DD4BF")};opacity:${on ? 1 : 0}"><b>${esc(initials(b.name))}</b></div>`;
+  const phoneFrame = (inner, cls = "") => `<div class="phone ${cls}"><div class="scr">${inner}</div></div>`;
 
-  const heroshot = b.hero
-    ? `<div class="heroshot device reveal" style="--i:2">${deviceBar(b.demo ? "quietoperator.ai/" + b.demo : b.live ? b.live.replace(/^https?:\/\//, "") : b.name)}<div class="screen"><img src="${esc(b.hero)}" alt="${esc(b.name)}" class="on"></div></div>`
-    : "";
+  const heroDesk = b.hero ? `<div class="device">${deviceBar(url)}<div class="screen"><img src="${esc(b.hero)}" alt="${esc(b.name)} on a desktop" class="on"></div></div>` : "";
+  const heroPh = b.heroPhone ? phoneFrame(`<img src="${esc(b.heroPhone)}" alt="${esc(b.name)} on a phone" class="on">`) : heroDesk;
+  const toggle = hasPhone ? `<div class="view-row reveal" style="--i:2"><span>Screens</span><div class="viewtoggle" role="group" aria-label="Screenshot size"><button type="button" data-mode="desktop">Desktop</button><button type="button" data-mode="phone">Phone</button></div></div>` : "";
+  const heroBlock = heroDesk || heroPh ? `<div class="heroshot reveal" style="--i:2"><div class="for-desktop">${heroDesk}</div><div class="for-phone">${heroPh}</div></div>` : "";
 
-  const steps = b.features.map(([t, d, cap, src], k) => `
+  const steps = b.features.map(([t, d, cap, src, psrc], k) => {
+    const deskMini = `<div class="mini">${src ? `<img src="${esc(src)}" alt="${esc(cap)}" loading="lazy">` : `<span>${esc(cap)}</span>`}</div>`;
+    const phoneMini = psrc ? phoneFrame(`<img class="on" src="${esc(psrc)}" alt="${esc(cap)} on a phone" loading="lazy">`) : deskMini;
+    return `
     <div class="step${k === 0 ? " on" : ""}" data-k="${k}">
       <h3>${esc(t)}</h3><p>${esc(d)}</p>
-      <div class="mshot mini">${src ? `<img src="${esc(src)}" alt="${esc(cap)}" loading="lazy">` : `<span>${esc(cap)}</span>`}</div>
-    </div>`).join("");
-  const stageShots = b.features.map(([t, d, cap, src], k) => src
-    ? `<img src="${esc(src)}" alt="${esc(cap)}" class="${k === 0 ? "on" : ""}" data-k="${k}">`
-    : `<div class="tile ${k === 0 ? "on" : ""}" data-k="${k}" style="--tile:${esc(b.tile || "#2DD4BF")};opacity:${k === 0 ? 1 : 0}"><b>${esc(initials(b.name))}</b></div>`).join("");
+      <div class="mshot"><div class="for-desktop">${deskMini}</div><div class="for-phone">${phoneMini}</div></div>
+    </div>`;
+  }).join("");
+  const deskShots = b.features.map(([t, d, cap, src], k) => src ? `<img src="${esc(src)}" alt="${esc(cap)}" class="${k === 0 ? "on" : ""}" data-k="${k}">` : tileFor(k, k === 0)).join("");
+  const phoneShots = b.features.map(([t, d, cap, src, psrc], k) => psrc ? `<img src="${esc(psrc)}" alt="${esc(cap)} on a phone" class="${k === 0 ? "on" : ""}" data-k="${k}">` : tileFor(k, k === 0)).join("");
 
   app.innerHTML = `
-    <div class="page">
+    <div class="page mode-${startMode}">
     <a class="crumb reveal" style="--i:0" href="#/">All builds</a>
     <header class="bhead reveal" style="--i:1">
       <div>
         <h1>${esc(b.name)}${b.subtitle ? `<small>${esc(b.subtitle)}</small>` : ""}</h1>
         <p class="one">${esc(b.one)}</p>
-        <div class="chips">${b.stack.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div>
+        <div class="chips">${b.stack.map((x) => `<span class="chip">${esc(x)}</span>`).join("")}</div>
       </div>
       <div class="meta">
         ${lamp(b.status)}
@@ -493,7 +546,8 @@ function renderBuild(slug) {
         <span class="note">Built with ${esc(b.builtWith)}</span>
       </div>
     </header>
-    ${heroshot}
+    ${toggle}
+    ${heroBlock}
 
     <section class="sec">
       <h2>Why I built it</h2>
@@ -505,7 +559,8 @@ function renderBuild(slug) {
       <div class="story">
         <div class="steps" id="steps">${steps}</div>
         <div class="stage">
-          <div class="device"><div class="bar"><i></i><i></i><i></i><span class="url">${esc(b.name)}</span></div><div class="screen" id="stage-screen">${stageShots}</div></div>
+          <div class="for-desktop"><div class="device">${deviceBar(b.name)}<div class="screen" id="stage-desk">${deskShots}</div></div></div>
+          <div class="for-phone">${phoneFrame(phoneShots, "stage-phone")}</div>
           <div class="label" id="stage-label">${esc(b.features[0][2])}</div>
         </div>
       </div>
@@ -531,24 +586,55 @@ function renderBuild(slug) {
     </div>`;
   window.scrollTo(0, 0);
 
-  // scroll story: the step nearest the middle of the viewport drives the sticky frame
+  const page = app.querySelector(".page");
+  const setMode = (m) => {
+    page.classList.toggle("mode-phone", m === "phone"); page.classList.toggle("mode-desktop", m !== "phone");
+    app.querySelectorAll(".viewtoggle button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.mode === m)));
+  };
+  setMode(startMode);
+  app.querySelectorAll(".viewtoggle button").forEach((x) => x.addEventListener("click", () => setMode(x.dataset.mode)));
+
+  // scroll story: the step nearest the middle of the viewport drives both frames
   const stepEls = [...app.querySelectorAll("#steps .step")];
-  const shots = [...app.querySelectorAll("#stage-screen > *")];
+  const shots = [...app.querySelectorAll(".stage [data-k]")];
   const label = app.querySelector("#stage-label");
   const activate = (k) => {
-    stepEls.forEach((s) => s.classList.toggle("on", Number(s.dataset.k) === k));
-    shots.forEach((s) => { const on = Number(s.dataset.k) === k; s.classList.toggle("on", on); if (s.classList.contains("tile")) s.style.opacity = on ? 1 : 0; });
+    stepEls.forEach((x) => x.classList.toggle("on", Number(x.dataset.k) === k));
+    shots.forEach((x) => { const on = Number(x.dataset.k) === k; x.classList.toggle("on", on); if (x.classList.contains("tile")) x.style.opacity = on ? 1 : 0; });
     label.textContent = b.features[k][2];
   };
   const onScroll = () => {
-    const mid = window.innerHeight * 0.45;
-    let best = 0, bestD = Infinity;
-    stepEls.forEach((s) => { const r = s.getBoundingClientRect(); const c = r.top + r.height / 2; const dd = Math.abs(c - mid); if (dd < bestD) { bestD = dd; best = Number(s.dataset.k); } });
+    const mid = window.innerHeight * 0.45; let best = 0, bestD = Infinity;
+    stepEls.forEach((x) => { const r = x.getBoundingClientRect(); const dd = Math.abs(r.top + r.height / 2 - mid); if (dd < bestD) { bestD = dd; best = Number(x.dataset.k); } });
     activate(best);
   };
   window.addEventListener("scroll", onScroll, { passive: true });
-  stepEls.forEach((s) => s.addEventListener("click", () => activate(Number(s.dataset.k))));
+  stepEls.forEach((x) => x.addEventListener("click", () => activate(Number(x.dataset.k))));
   cleanup.push(() => window.removeEventListener("scroll", onScroll));
+
+  // the real demo inside a phone-sized frame (live site only)
+  const pd = app.querySelector("#phone-demo");
+  if (pd) pd.addEventListener("click", () => openPhoneDemo(b));
+}
+
+function openPhoneDemo(b) {
+  const scale = Math.min(1, (window.innerHeight - 110) / 892, (window.innerWidth - 32) / 412);
+  const o = document.createElement("div");
+  o.className = "phone-modal"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); o.setAttribute("aria-label", `${b.name} at phone size`);
+  o.innerHTML = `<div class="pm-inner">
+      <div class="pm-size" style="width:${412 * scale}px;height:${892 * scale}px">
+        <div class="phone live" style="transform:scale(${scale})"><div class="scr"><iframe src="${esc(b.demo)}" title="${esc(b.name)} demo at phone size"></iframe></div></div>
+      </div>
+      <div class="pm-bar"><span>${esc(b.name)} at phone size, with sample data.</span><a class="btn ghost" href="${esc(b.demo)}">Open full screen</a><button class="btn" type="button" data-close>Close</button></div>
+    </div>`;
+  const close = () => { o.remove(); document.body.style.overflow = ""; window.removeEventListener("keydown", onKey); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  o.addEventListener("click", (e) => { if (e.target === o || e.target.closest("[data-close]")) close(); });
+  window.addEventListener("keydown", onKey);
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(o);
+  o.querySelector("[data-close]").focus();
+  cleanup.push(close);
 }
 
 function renderAbout() {
@@ -557,13 +643,14 @@ function renderAbout() {
     <section class="about page">
       <h1 class="reveal" style="--i:0">About</h1>
       <div class="body reveal" style="--i:1">
-        <p>I'm Bill Wagner. I build software in my free time, in Atlanta, and I'm not a professional developer.</p>
-        <p>Everything on this site started as a small, specific annoyance: a grocery list that forgot what I always buy, a week that never got planned, a decision I kept making on a hunch instead of a number. Instead of hunting for an app, I describe the problem to an AI, argue with it about the smallest version worth building, and ship that. Then I use it every day until it's obviously right or obviously wrong. Either way I learn something, and either way my week gets a little better.</p>
-        <p>Self-taught, in the honest sense: no bootcamp, no degree in this, just years of reading, breaking things, and learning to ask better questions. The tools have changed what self-taught can mean. What used to take a team now takes a clear head and a patient conversation.</p>
+        <p>I'm Bill Wagner. I build software in my free time, in Atlanta. I'm self-taught and not a professional developer, which means I've had to get good at the parts that aren't typing code: deciding what to build, specifying it precisely, and judging whether what came back is right.</p>
+        <p>Everything on this site started as a small, specific annoyance: a grocery list that forgot what I always buy, a week that never got planned, a decision I kept making on a hunch instead of a number. Instead of hunting for an app, I write down what the tool has to do, decide where it should live, and build the smallest version worth using. Then I use it every day until it's obviously right or obviously wrong. Either way I learn something, and either way my week gets a little better.</p>
+        <p>Self-taught, in the honest sense: no bootcamp, no degree in this, just years of reading, breaking things, and learning to ask better questions. The tools have changed what one person can build. They haven't changed what makes software good: a clear problem, a sound data model, and someone who checks the work.</p>
         <p>None of these are products. They're tools I rely on, which is the only test I care about. If one of them turns out to be useful to you, that's a bonus.</p>
         <div class="tools">
           <h3>How I work</h3>
-          <p>Claude for thinking, writing, and prompts. Replit Agent for apps. Plain HTML for websites, iterated as numbered mockups. Static hosting for all of it. No hand-written code, and no feature that didn't start as a conversation about what problem it solves.</p>
+          <p>Claude for planning, briefs, and judgment calls. Replit for full-stack web apps. Claude Code when I'm working directly in a repository. OpenClaw, an always-on assistant on a home server, for scheduled jobs that keep the other tools fed. GitHub, Cloudflare, Supabase, Vercel, and Resend for hosting, data, and email. Plain HTML for websites.</p>
+          <p>AI writes most of the code. I own the decisions: what gets built, how the data is shaped, what stays private, and what gets cut.</p>
           <h3>Get in touch</h3>
           <p><span class="placeholder">Contact link goes here</span></p>
         </div>
