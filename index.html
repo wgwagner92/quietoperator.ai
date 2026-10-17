@@ -185,7 +185,20 @@
   .caps li { font-size: .78rem; font-weight: 500; color: var(--ink); border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: .22rem .6rem; }
   .card .open { font-weight: 600; font-size: .92rem; color: var(--accent-ink-text, var(--accent)); margin-top: .2rem; filter: saturate(.8) brightness(.85); }
   .card:hover .open { text-decoration: underline; text-underline-offset: 3px; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .card.wide { grid-template-columns: 1fr; } .card.wide .card-media { aspect-ratio: 16 / 10; min-height: 0; } .grid-head { flex-direction: column; align-items: flex-start; gap: .2rem; } }
+  .grid.tools { grid-template-columns: repeat(3, 1fr); }
+  .grid.tools .card:not(.wide) .card-top h3 { font-size: 1.25rem; }
+  /* websites: a separate section with browser-framed cards */
+  .sites { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line-strong); }
+  .sites-head { display: grid; grid-template-columns: 1fr 2fr; gap: .8rem 3rem; align-items: start; margin-bottom: 1.6rem; }
+  .sites-head h2 { font-size: clamp(1.3rem, 2.2vw, 1.6rem); }
+  .sites-head p { color: var(--muted); margin: 0; }
+  .card.site .card-media { display: grid; grid-template-rows: auto 1fr; aspect-ratio: auto; }
+  .card.site .card-media .bar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--frame-bar); border-bottom: 1px solid rgba(255,255,255,.06); }
+  .card.site .card-media .bar i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.16); }
+  .card.site .card-media .bar .url { margin-left: 8px; flex: 1; max-width: 300px; font-size: 11px; color: var(--frame-ink); background: rgba(255,255,255,.05); border-radius: 5px; padding: 4px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card.site .card-media .view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+  @media (max-width: 760px) { .sites-head { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) { .grid, .grid.tools { grid-template-columns: 1fr; } .card.wide { grid-template-columns: 1fr; } .card.wide .card-media { aspect-ratio: 16 / 10; min-height: 0; } .grid-head { flex-direction: column; align-items: flex-start; gap: .2rem; } }
 
   /* ---------- home: how I build ---------- */
   .how { margin-top: 4.5rem; }
@@ -420,7 +433,7 @@ const BUILDS = [
     hood: "A single-user web app built in Replit, installed as a PWA. It has no analytics or outside scripts, a rate-limited PIN on top of sign-in, and an export that never includes security data. The design decisions were made deliberately: a slip resets the streak but keeps cumulative statistics, and the app is intentionally not connected to any other tool in this collection. The demo uses invented sample data throughout.",
   },
   {
-    slug: "lions", goal: "Give a service club a modern front door and a fundraiser it can run.", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
+    slug: "lions", kind: "site", goal: "Give a service club a modern front door and a fundraiser it can run.", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
     one: "A real front door for a 40-member service club. Meetings, causes, events, photos, and how to join, plus a 24-day advent-calendar fundraiser with a daily winner reveal, all on one fast page built for phones first.",
     caps: ["24-door fundraiser grid", "Daily winner reveal", "Causes, events and photos", "Phone-first layout", "No framework, one file"],
     stack: ["Static HTML", "Single page", "Custom domain"], builtWith: "Claude, iterated as mockups", demo: null, live: "https://nephillylions.org", hero: "img/lions/hero.jpg", heroPhone: "img/lions/m-about.jpg",
@@ -436,7 +449,7 @@ const BUILDS = [
     hood: "One static HTML file with its own CSS and a little JavaScript for the calendar grid and filters. No framework, no build step, nothing to maintain. Designed as a series of numbered mockups reviewed with the club before it went live.",
   },
   {
-    slug: "arc", goal: "Explain a premium mentorship service to parents, plainly.", name: "ARC", status: "mockup", tile: "#C9705A",
+    slug: "arc", kind: "site", goal: "Explain a premium mentorship service to parents, plainly.", name: "ARC", status: "mockup", tile: "#C9705A",
     one: "A marketing-site concept for an executive-mentorship practice. Nine views in a single file, an explorable four-phase method, a pitch that changes with the student's stage, and a plain-spoken scorecard, iterated through nine complete, clickable mockups.",
     caps: ["Nine views, one file", "Explorable four-phase method", "Stage-specific pitch", "Scorecard", "Clickable mockup rounds"],
     stack: ["Static HTML", "Nine views, one file", "Embedded images"], builtWith: "Claude, nine mockup rounds", demo: null, live: null, hero: "img/arc/hero.jpg", heroPhone: "img/arc/m-home.jpg",
@@ -472,18 +485,28 @@ function deviceBar(url) { return `<div class="bar"><i></i><i></i><i></i><span cl
 
 function renderHome() {
   document.title = "Quiet Operator";
-  const cards = BUILDS.map((b, k) => `
-    <a class="card reveal${k === 0 ? " wide" : ""}" style="--accent:${esc(b.tile || "#2DD4BF")};--i:${k + 4}" href="#/builds/${b.slug}">
-      <div class="card-media">
-        ${b.hero ? `<img class="shot" src="${esc(b.hero)}" alt="" loading="lazy">` : `<div class="tilebg"><b>${esc(initials(b.name))}</b></div>`}
-        ${b.heroPhone ? `<img class="shot-p" src="${esc(b.heroPhone)}" alt="" loading="lazy">` : ""}
-      </div>
+  const TOOLS = BUILDS.filter((b) => b.kind !== "site"), SITES = BUILDS.filter((b) => b.kind === "site");
+  const body = (b) => `
       <div class="card-body">
         <div class="card-top"><div><h3>${esc(b.name)}</h3>${b.goal ? `<p class="goal">${esc(b.goal)}</p>` : ""}</div>${lamp(b.status)}</div>
         <p>${esc(b.one)}</p>
         ${b.caps ? `<ul class="caps">${b.caps.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
         <span class="open">${b.demo ? "Open the build and try the demo" : b.live ? "Open the build and visit the site" : "Open the build"}</span>
-      </div>
+      </div>`;
+  const shot = (b) => b.hero ? `<img class="shot" src="${esc(b.hero)}" alt="" loading="lazy">` : `<div class="tilebg"><b>${esc(initials(b.name))}</b></div>`;
+  const cards = TOOLS.map((b, k) => `
+    <a class="card reveal${k === 0 ? " wide" : ""}" style="--accent:${esc(b.tile || "#2DD4BF")};--i:${k + 4}" href="#/builds/${b.slug}">
+      <div class="card-media">
+        ${shot(b)}
+        ${b.heroPhone ? `<img class="shot-p" src="${esc(b.heroPhone)}" alt="" loading="lazy">` : ""}
+      </div>${body(b)}
+    </a>`).join("");
+  const siteCards = SITES.map((b, k) => `
+    <a class="card site reveal" style="--accent:${esc(b.tile || "#2DD4BF")};--i:${k + 10}" href="#/builds/${b.slug}">
+      <div class="card-media">
+        <div class="bar"><i></i><i></i><i></i><span class="url">${esc(b.live ? b.live.replace(/^https?:\/\//, "") : "Concept, not online")}</span></div>
+        <div class="view">${shot(b)}</div>
+      </div>${body(b)}
     </a>`).join("");
   const tools = TOOLBOX.map(([t, c]) => `<div class="tool"><dt>${esc(t)}</dt><dd>${esc(c)}</dd></div>`).join("");
   const rules = PRINCIPLES.map(([t, c]) => `<li><b>${esc(t)}.</b> ${esc(c)}</li>`).join("");
@@ -493,7 +516,7 @@ function renderHome() {
         <h1 class="reveal" style="--i:0">${esc(SITE.headline)}</h1>
         <p class="lede reveal" style="--i:1">${esc(SITE.lede)}</p>
         <div class="cta reveal" style="--i:2">
-          <a class="btn" href="#builds">See the six builds</a>
+          <a class="btn" href="#builds">See the tools</a>
           ${PREVIEW ? `<a class="btn ghost" href="${esc(BUILDS[0].demoPreview)}" target="_blank" rel="noopener">Try a live demo</a>` : `<a class="btn ghost" href="${esc(BUILDS[0].demo)}">Try a live demo</a>`}
         </div>
       </div>
@@ -506,9 +529,13 @@ function renderHome() {
         </div>
       </div>
     </section>
-    <div class="grid-head reveal" style="--i:3" id="builds"><h2>Six builds</h2><span>Live, mockup, or paused, the lamp says which</span></div>
-    <section class="grid" aria-label="Builds">${cards}</section>
-    <section class="how reveal" style="--i:10">
+    <div class="grid-head reveal" style="--i:3" id="builds"><h2>Tools</h2><span>Built for my own week. Each one has a working demo on sample data.</span></div>
+    <section class="grid tools" aria-label="Tools">${cards}</section>
+    <section class="sites" aria-labelledby="sites-title">
+      <div class="sites-head reveal" style="--i:9"><h2 id="sites-title">Websites</h2><p>Two sites I put together for people I know: one for a family member's service club, one a concept for a mentorship practice.</p></div>
+      <div class="grid">${siteCards}</div>
+    </section>
+    <section class="how reveal" style="--i:12">
       <div class="how-head">
         <h2>How I build</h2>
         <p>Different problems get different tools. What stays the same is the order of work: decide what the thing is for, write it down, then build the smallest version that does that job.</p>
@@ -516,7 +543,7 @@ function renderHome() {
       <dl class="toolbox">${tools}</dl>
       <div class="rules"><h3>Rules I build by</h3><ul>${rules}</ul></div>
     </section>
-    <section class="about-teaser reveal" style="--i:11">
+    <section class="about-teaser reveal" style="--i:13">
       <h2>Who's behind it</h2>
       <div>
         <p>Bill Wagner. Self-taught, builds in his free time, and aims every tool at a problem in his own week. Quiet Operator is the name on the workshop door.</p>
