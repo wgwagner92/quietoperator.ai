@@ -185,8 +185,6 @@
   .caps li { font-size: .78rem; font-weight: 500; color: var(--ink); border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: .22rem .6rem; }
   .card .open { font-weight: 600; font-size: .92rem; color: var(--accent-ink-text, var(--accent)); margin-top: .2rem; filter: saturate(.8) brightness(.85); }
   .card:hover .open { text-decoration: underline; text-underline-offset: 3px; }
-  .grid.tools { grid-template-columns: repeat(3, 1fr); }
-  .grid.tools .card:not(.wide) .card-top h3 { font-size: 1.25rem; }
   /* websites: a separate section with browser-framed cards */
   .sites { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line-strong); }
   .sites-head { display: grid; grid-template-columns: 1fr 2fr; gap: .8rem 3rem; align-items: start; margin-bottom: 1.6rem; }
@@ -338,7 +336,7 @@
    ===================================================================== */
 const SITE = {
   headline: "Small software, built to be used every day.",
-  lede: "I'm Bill. In my free time I design and build small software and use it every day: a life operating system, a thinking journal, a friendship map, a recovery companion, and a couple of websites. Everything here is real and running. Open any of them and try it with sample data.",
+  lede: "I'm Bill. In my free time I design and build small software and use it every day: a life operating system, a thinking journal, a friendship map, a recovery companion, a daily routine guide, and a couple of websites. Everything here is real and running. Open any of them and try it with sample data.",
   day: [
     { t: "6:40", h: 6.67, app: "keel", area: "Recover", text: "Ten seconds in Keel: mood, sleep, peak craving. The count ticks over to 47.", shot: "img/keel/m-checkin.jpg" },
     { t: "7:15", h: 7.25, app: "chief-of-stuff", area: "Plan", text: "Chief of Stuff's dashboard: today's tasks, tonight's dinner, the calendar, and the overnight news brief the assistant pulled in.", shot: "img/chief-of-stuff/m-dashboard.jpg" },
@@ -346,7 +344,7 @@ const SITE = {
     { t: "12:30", h: 12.5, app: "chief-of-stuff", area: "Eat", text: "Shop mode at the store: the list the meal plan sent over, big checkboxes, one hand free.", shot: "img/chief-of-stuff/m-shopmode.jpg" },
     { t: "18:30", h: 18.5, app: "chief-of-stuff", area: "Move", text: "Push day, dropped onto the week last Sunday. It was already on the calendar.", shot: "img/chief-of-stuff/m-week.jpg" },
     { t: "20:00", h: 20, app: "orbit", area: "Connect", text: "Dinner with Priya. Thirty seconds to log the touchpoint in Orbit: looked forward to it, left with more energy.", shot: "img/orbit/m-touchpoints.jpg" },
-    { t: "21:30", h: 21.5, app: "calibrate", area: "Think", text: "The 9:00 prediction resolved: right, and the process was sound. The calibration curve moves a hair.", shot: "img/calibrate/m-score.jpg" },
+    { t: "21:05", h: 21.08, app: "cadence", area: "Rest", text: "Wind-down in Cadence. Screens off is up next: kept or broken, one tap. Friday's kitchen rule is a planned exception, not a miss.", shot: "img/cadence/m-evening.jpg" },
     { t: "22:00", h: 22, app: "chief-of-stuff", area: "Plan", text: "Tomorrow's prep note is already on the meal grid: dice the onions tonight. Board cleared, phone down.", shot: "img/chief-of-stuff/m-meals.jpg" },
   ],
 };
@@ -431,6 +429,23 @@ const BUILDS = [
     ],
     week: "The morning check-in takes ten seconds. The dashboard shows the current run, the all-time total, and the next milestone. On a hard day it's a place to look at the numbers instead of arguing with them.",
     hood: "A single-user web app built in Replit, installed as a PWA. It has no analytics or outside scripts, a rate-limited PIN on top of sign-in, and an export that never includes security data. The design decisions were made deliberately: a slip resets the streak but keeps cumulative statistics, and the app is intentionally not connected to any other tool in this collection. The demo uses invented sample data throughout.",
+  },
+  {
+    slug: "cadence", goal: "Run daily routines consistently, and learn which ones actually help.", name: "Cadence", status: "live", tile: "#7CC49A",
+    one: "A guide for the routines that make up a day: skincare, supplements, training, heat and cold, wind-down. Every step hangs off wake time or bedtime, so the day reads as one timeline with a Now / Up next card on top. Each step gets logged, and a 20-second morning and evening check-in records how the day felt.",
+    caps: ["Timeline anchored to wake and bedtime", "Now / Up next", "Rotations and planned exceptions", "Weekly targets and a toolkit", "20-second check-ins", "Versioned protocols"],
+    stack: ["React + Vite", "Express", "Replit", "Postgres", "Installed PWA"], builtWith: "Replit, from briefs written in Claude", demo: "demo/cadence/", demoPreview: "https://claude.ai/artifact/YasFXe4wrseiBeVhrbUZQm", live: null, hero: "img/cadence/hero.jpg", heroPhone: "img/cadence/m-hero.jpg", primary: "phone",
+    why: "Routines drift. Steps get skipped, products change, and after a month it's hard to say what any of it is doing. Cadence keeps the plan in one place, makes the next step obvious, and records just enough about how the day felt to compare the two later.",
+    features: [
+      ["The day as one timeline", "Each protocol is set relative to wake time or bedtime, pinned to a clock time, or left as anytime. Change the wake time and the whole morning moves with it. Steps that happen together fold into one card with a single Mark all done.", "Today's timeline", "img/cadence/timeline.jpg", "img/cadence/m-timeline.jpg"],
+      ["Kept, broken, or excepted", "Rules like screens off or kitchen closed are logged as kept or broken, without commentary. Skincare actives rotate nightly on their own. A planned exception, like a Friday dinner out, shows on the day but doesn't count as a miss.", "Friday evening", "img/cadence/evening.jpg", "img/cadence/m-evening.jpg"],
+      ["A 20-second check-in", "Morning covers sleep, how rested, and mood. Evening covers energy, focus, mood, and stress. Five taps and an optional note.", "Evening check-in", "img/cadence/checkin.jpg", "img/cadence/m-checkin.jpg"],
+      ["Weekly targets and a toolkit", "Some things don't belong on a timeline. Sauna and cold are weekly minute targets with a session range and a timing rule: no cold within six hours after strength training. Breathing tools sit in an on-demand toolkit, one tap to log a use.", "Weekly progress", "img/cadence/targets.jpg", "img/cadence/m-targets.jpg"],
+      ["Versioned protocols", "Every edit saves a new version with a note, and each day records which version it ran, so changing a routine doesn't blur the history.", "Version history", "img/cadence/versions.jpg", "img/cadence/m-versions.jpg"],
+      ["Patterns, labeled as patterns", "One check-in rating against one protocol's completion, day by day, as a scatter plot with a correlation. It calls itself descriptive, not a conclusion, and shows no number until there are five paired days.", "Patterns", "img/cadence/patterns.jpg", "img/cadence/m-patterns.jpg"],
+    ],
+    week: "Mornings start on the Today screen: water, daylight, skincare, supplements with breakfast, a check-in. Training appears on the days it's scheduled. In the evening the screen moves to the wind-down: screens off, lights down, the skincare rotation, reading, lights out. Sauna and cold sessions get logged when they happen and the week's progress fills in.",
+    hood: "A single-user web app built in Replit and installed as a PWA. React and Vite on the front, Express and a Postgres key-value table behind it, with typed API hooks generated from an OpenAPI spec. Each day stores a snapshot of its plan, so history stays accurate after protocols change. A key-protected endpoint returns today's plan for a future card on the Chief of Stuff dashboard. Next, after about a month of data: next-morning effects, whether tonight's routine shows up in tomorrow's check-in. The demo runs the app's own scheduling logic in the browser against invented sample data.",
   },
   {
     slug: "lions", kind: "site", goal: "Give a service club a modern front door and a fundraiser it can run.", name: "Philadelphia Northeast Lions Club", status: "live", tile: "#D9A21B",
